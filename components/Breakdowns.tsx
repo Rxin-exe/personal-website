@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { breakdowns, type Breakdown } from "@/content/site";
+import { brandIcons } from "./brandIcons";
 import Modal from "./Modal";
 import { tilt } from "./tilt";
 import Reveal from "./Reveal";
@@ -19,9 +20,7 @@ export default function Breakdowns() {
             <button className="card" onClick={() => setOpen(b)} aria-haspopup="dialog" {...tilt}>
               <div className="card-body">
                 <div className="breakdown-head">
-                  <span className="logo-mark" aria-hidden="true">
-                    {b.logo}
-                  </span>
+                  <LogoMark breakdown={b} />
                   <span className="breakdown-product">{b.product}</span>
                 </div>
                 <h3>{b.title}</h3>
@@ -135,9 +134,7 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       <article className="modal-content">
         <header className="modal-header">
           <div className="breakdown-head">
-            <span className="logo-mark" aria-hidden="true">
-              {b.logo}
-            </span>
+            <LogoMark breakdown={b} />
             <span className="breakdown-product">
               {b.product} · {b.readTime}
             </span>
@@ -156,5 +153,20 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
         ))}
       </article>
     </Modal>
+  );
+}
+
+function LogoMark({ breakdown: b }: { breakdown: Breakdown }) {
+  const path = b.icon ? brandIcons[b.icon] : undefined;
+  return (
+    <span className="logo-mark" aria-hidden="true">
+      {path ? (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+          <path d={path} />
+        </svg>
+      ) : (
+        b.logo
+      )}
+    </span>
   );
 }

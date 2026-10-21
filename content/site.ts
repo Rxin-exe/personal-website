@@ -147,7 +147,8 @@ export const projects: Project[] = [
 export type Breakdown = {
   id: string;
   product: string;
-  logo: string; // short text mark shown as a placeholder logo
+  logo: string; // short text mark, shown if there's no icon
+  icon?: string; // key into components/brandIcons.ts
   title: string;
   category: string;
   readTime: string;
@@ -165,6 +166,7 @@ export const breakdowns: Breakdown[] = [
     id: "duolingo-streaks",
     product: "Duolingo",
     logo: "Du",
+    icon: "duolingo",
     title: "Why Duolingo's streaks work, and where they break",
     category: "Growth",
     readTime: "6 min read",
@@ -231,6 +233,7 @@ export const breakdowns: Breakdown[] = [
     id: "notion-onboarding",
     product: "Notion",
     logo: "N",
+    icon: "notion",
     title: "Notion's blank page problem",
     category: "Onboarding",
     readTime: "5 min read",
@@ -297,6 +300,7 @@ export const breakdowns: Breakdown[] = [
     id: "spotify-monetization",
     product: "Spotify",
     logo: "Sp",
+    icon: "spotify",
     title: "How Spotify's free tier sells Premium",
     category: "Monetization",
     readTime: "6 min read",
@@ -363,6 +367,7 @@ export const breakdowns: Breakdown[] = [
     id: "strava-climbing",
     product: "Strava",
     logo: "St",
+    icon: "strava",
     title: "Strava won runners. Why doesn't it work for climbers?",
     category: "Expansion",
     readTime: "5 min read",
