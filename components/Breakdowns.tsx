@@ -12,7 +12,7 @@ export default function Breakdowns() {
 
   return (
     <section id="breakdowns" className="container section" aria-labelledby="breakdowns-title">
-      <SectionHead id="breakdowns" eyebrow="Product Breakdowns" title="How I think about products." intro="Teardowns of products I use: what works, what breaks, and what I'd build next." />
+      <SectionHead id="breakdowns" eyebrow="Product Breakdowns" title="How I think about products." intro="Teardowns of products people love: what works, what breaks, and what I'd build next." />
       <ul className={`grid ${breakdowns.length % 2 === 0 && breakdowns.length % 3 !== 0 ? "grid-2" : ""}`} style={{ listStyle: "none", padding: 0 }}>
         {breakdowns.map((b, i) => (
           <Reveal as="li" key={b.id} delay={i * 90}>
