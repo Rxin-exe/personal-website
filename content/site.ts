@@ -394,8 +394,8 @@ export const experiment = {
 export const contact = {
   heading: "Let's build something.",
   line: "I'm actively looking for PM opportunities. Always happy to chat about products.",
-  email: "[EMAIL]",
-  linkedin: "[LINKEDIN_URL]",
+  email: "ronanwong@berkeley.edu",
+  linkedin: "https://www.linkedin.com/in/ronanwong",
 };
 
 export const nav = [
