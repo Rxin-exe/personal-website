@@ -4,7 +4,7 @@
  */
 
 export const site = {
-  url: "https://example.com", // [SITE_URL] — used for Open Graph links
+  url: "http://localhost:3000", // only used locally; on Vercel the production domain is detected automatically
   title: "Ronan Wong — Product Manager",
   description:
     "Ronan Wong is an aspiring Product Manager studying Data Science and Cognitive Science at UC Berkeley.",

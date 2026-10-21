@@ -6,7 +6,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.url),
+  // On Vercel, use the real production domain; otherwise fall back to site.url.
+  metadataBase: new URL(
+    process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : site.url
+  ),
   title: site.title,
   description: site.description,
   openGraph: {
@@ -15,13 +18,11 @@ export const metadata: Metadata = {
     title: site.title,
     description: site.description,
     siteName: profile.name,
-    images: [{ url: profile.photo, alt: profile.photoAlt }],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: site.title,
     description: site.description,
-    images: [profile.photo],
   },
 };
 
