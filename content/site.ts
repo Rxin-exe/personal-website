@@ -465,6 +465,7 @@ export const contact = {
   line: "I'm actively looking for PM opportunities. Always happy to chat about products.",
   email: "ronanwong@berkeley.edu",
   linkedin: "https://www.linkedin.com/in/ronanwong",
+  resume: "/Ronan_Wong_Resume.pdf", // phone number and grad date removed
 };
 
 export const nav = [

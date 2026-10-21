@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { nav, profile } from "@/content/site";
+import { contact, nav, profile } from "@/content/site";
 
 export default function Nav() {
   const [active, setActive] = useState("");
@@ -70,6 +70,11 @@ export default function Nav() {
               </a>
             </li>
           ))}
+          <li>
+            <a href={contact.resume} className="nav-resume" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+              Resume
+            </a>
+          </li>
         </ul>
       </nav>
     </header>
