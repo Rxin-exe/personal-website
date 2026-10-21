@@ -21,8 +21,8 @@ export const profile = {
     "I combine data and an understanding of how people think to build products users actually love.",
   about: [
     "I started out studying Computer Science at Mt. San Antonio College, where I learned to break problems into pieces and build things that work. I then transferred to UC Berkeley, where I now study Data Science and Cognitive Science.",
-    "I found product at the intersection of data and human behavior: understanding what users do, why they do it, and how to build for it. Data tells me where people get stuck; cognitive science helps me understand why. [ADD PERSONAL DETAIL]",
-    "I'm currently looking for [APM / PM internship or new grad roles starting YEAR].",
+    "I found product at the intersection of data and human behavior: understanding what users do, why they do it, and how to build for it. Working with students with disabilities taught me to build with care for people whose needs are easy to overlook, and research showed me how much I love talking with people and understanding their problems up close. Product is where I bring that attentive perspective.",
+    "I'm an AI-native builder: I prototype rapidly and relentlessly, making apps that build community, support learning, and create real impact. I'm currently looking for PM and APM internships for Summer 2027.",
   ],
   strengths: [
     "Data Analysis",
@@ -31,6 +31,9 @@ export const profile = {
     "User Research",
     "Behavioral Insights",
     "Experiment Design",
+    "AI Prototyping",
+    "Rapid Prototyping",
+    "Accessibility",
   ],
 };
 
