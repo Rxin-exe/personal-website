@@ -16,7 +16,7 @@ export const profile = {
   showPhoto: false, // set to true to show the photo in the hero
   photo: "/profile.svg", // [PHOTO_URL] — drop a square photo in /public and point to it
   photoAlt: "Portrait of Ronan Wong",
-  headline: "Aspiring Product Manager · Data Science & Cognitive Science @ UC Berkeley",
+  headline: "Product Manager · Data Science & Cognitive Science @ UC Berkeley",
   valueStatement:
     "I combine data and an understanding of how people think to build products users actually love.",
   about: [
