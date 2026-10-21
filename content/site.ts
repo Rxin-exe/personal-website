@@ -41,7 +41,7 @@ export type TimelineEntry = {
   title: string;
   org: string;
   dates: string;
-  type: "Education" | "Work";
+  type: "Education" | "Work" | "Leadership";
   bullets: string[];
 };
 
@@ -49,45 +49,43 @@ export const timeline: TimelineEntry[] = [
   {
     title: "B.A. Data Science & Cognitive Science",
     org: "University of California, Berkeley",
-    dates: "[START YEAR] – [EXPECTED GRAD YEAR]",
+    dates: "2026 – Present",
     type: "Education",
     bullets: [
-      "[Relevant coursework, e.g., Data 100, CogSci 131]",
-      "[Clubs or projects]",
-      "[One product-relevant insight from studying human cognition]",
+      "Coursework: CS 61A (Structure and Interpretation of Computer Programs), Data 8 (Foundations of Data Science)",
+      "Pairing data science with the study of how people think, perceive, and decide",
     ],
   },
   {
-    title: "[ROLE]",
-    org: "[COMPANY]",
-    dates: "[YEARS]",
+    title: "Product & Software Engineering Intern",
+    org: "Cal Hockey",
+    dates: "Aug 2026 – Present",
     type: "Work",
     bullets: [
-      "[User + problem: who you served and what was broken]",
-      "[What you did about it]",
-      "[Outcome, with a metric if possible]",
+      "Synthesized 12+ player, coach, and staff interviews on the team's biggest weekly time sink, film review, into a PRD, roadmap, and Figma prototype that won approval for a 4-game pilot",
+      "Piloted a live sideline tagging sheet that cut daily film review from 2–3 hours to 20 minutes and scoring errors by 67%",
+      "Adopted by the full coaching staff as the standard game-day workflow; now leading one-click clip retrieval with 2 engineers and 1 designer",
     ],
   },
   {
-    title: "[ROLE]",
-    org: "[COMPANY]",
-    dates: "[YEARS]",
+    title: "Founder & Product Lead",
+    org: "Sendo · AI form coach for climbers",
+    dates: "Feb 2026 – Present",
     type: "Work",
     bullets: [
-      "[User + problem: who you served and what was broken]",
-      "[What you did about it]",
-      "[Outcome, with a metric if possible]",
+      "Scoped the MVP to a single form-scoring feature after 15+ interviews and a 100-climber survey (80% lacked form feedback)",
+      "Shipped a real-time climb-scoring web app with 1 engineer and 1 designer; built the MediaPipe pose model myself",
+      "Reached 40+ beta users and 70% 30-day retention; an A/B test of per-move body cues took weekly climbs logged from 30 to 70",
     ],
   },
   {
-    title: "Computer Science",
-    org: "Mt. San Antonio College",
-    dates: "[START YEAR] – [END YEAR]",
-    type: "Education",
+    title: "Data Science Intern, Mortgage Process Automation",
+    org: "Outamation",
+    dates: "Nov 2025 – Mar 2026",
+    type: "Work",
     bullets: [
-      "[CS foundations, e.g., data structures, programming]",
-      "Transferred to UC Berkeley",
-      "[Any leadership or projects]",
+      "Turned stakeholder interviews into specs and Python pipelines that automate PDF field extraction, saving a 15-person team 10 hours a week",
+      "Benchmarked retrieval options on a 200-query test set to win sign-off on a RAG search design that improved retrieval relevance by 54%",
     ],
   },
 ];
