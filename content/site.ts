@@ -4,7 +4,7 @@
  */
 
 export const site = {
-  url: "http://localhost:3000", // only used locally; on Vercel the production domain is detected automatically
+  url: "https://ronanwong.vercel.app", // the site's public address, used for link previews
   title: "Ronan Wong — Product Manager",
   description:
     "Ronan Wong is an aspiring Product Manager studying Data Science and Cognitive Science at UC Berkeley.",

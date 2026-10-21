@@ -6,10 +6,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 
 export const metadata: Metadata = {
-  // On Vercel, use the real production domain; otherwise fall back to site.url.
-  metadataBase: new URL(
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : site.url
-  ),
+  metadataBase: new URL(site.url),
   title: site.title,
   description: site.description,
   openGraph: {
