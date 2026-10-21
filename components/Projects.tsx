@@ -13,7 +13,7 @@ export default function Projects() {
   return (
     <section id="projects" className="container section" aria-labelledby="projects-title">
       <SectionHead id="projects" eyebrow="Projects" title="Things I've built" intro="Real problems, real users, measurable outcomes." />
-      <ul className="grid" style={{ listStyle: "none", padding: 0 }}>
+      <ul className={`grid ${projects.length === 2 ? "grid-2" : ""}`} style={{ listStyle: "none", padding: 0 }}>
         {projects.map((p, i) => (
           <Reveal as="li" key={p.id} delay={i * 90}>
             <button className="card" onClick={() => setOpen(p)} aria-haspopup="dialog" {...tilt}>
@@ -73,7 +73,7 @@ function ProjectModal({ project: p, onClose }: { project: Project; onClose: () =
         </ul>
       ),
     },
-    { title: "What I'd Do Next", body: <p>{p.next}</p> },
+    ...(p.next ? [{ title: "What I'd Do Next", body: <p>{p.next}</p> }] : []),
   ];
 
   return (

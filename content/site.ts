@@ -104,92 +104,58 @@ export type Project = {
   approach: string[];
   solution: string;
   results: string[];
-  next: string;
+  next?: string;
   links?: { label: string; href: string }[];
 };
 
 export const projects: Project[] = [
   {
-    id: "study-buddy",
-    title: "StudySync",
-    problem: "Students abandon study plans within a week of making them.",
-    tags: ["Behavior Design", "Mobile", "User Research"],
-    result: "↑ 32% week-2 retention in pilot",
+    id: "sendo",
+    title: "Sendo",
+    problem: "Climbers improve slowly because almost no one gets feedback on their form.",
+    tags: ["0 → 1", "AI / Computer Vision", "A/B Testing"],
+    result: "70% 30-day retention",
     cover: "linear-gradient(135deg, #1c1917 0%, #292524 50%, #78350f 140%)",
     problemDetail:
-      "Most study planners assume students fail because they lack a schedule. Interviews showed the real problem: plans are too ambitious, so the first missed session makes the whole plan feel broken.",
-    users:
-      "Undergraduates in large lecture courses who self-report procrastinating before exams.",
-    role: "[Product lead — scoped the problem, ran 12 user interviews, wrote the spec, and analyzed pilot data.]",
+      "Most climbers learn by trial and error. Coaching is expensive and rare, so bad habits stick. In a 100-climber survey, 80% said they had no source of feedback on their form.",
+    users: "Recreational climbers who want to progress but don't have regular access to a coach.",
+    role: "Founder & Product Lead. I ran discovery, scoped the MVP, led 1 engineer and 1 designer, and built the MediaPipe pose model myself.",
     approach: [
-      "Interviewed 12 students and mapped where plans fell apart.",
-      "Used implementation-intention research to reframe goals as small, specific commitments.",
-      "Ran a 3-week pilot with two variants: fixed schedules vs. flexible daily commitments.",
+      "Ran 15+ user interviews and a 100-climber survey to find the most painful gap: no form feedback.",
+      "Scoped the MVP down to a single feature, form scoring, instead of a full training app.",
+      "After launch, 20+ surveyed users said raw metrics weren't helpful, so I A/B tested per-move body cues against them.",
     ],
     solution:
-      "A planner that asks for one 25-minute commitment per day and automatically reschedules a missed one instead of marking it failed.",
+      "A real-time web app that scores a climb from video using pose estimation, then tells the climber what to fix, move by move.",
     results: [
-      "↑ 32% week-2 retention vs. the fixed-schedule variant",
-      "68% of pilot users completed at least 4 sessions per week",
-      "“Missed session” drop-off fell from 41% to 19%",
+      "40+ beta users logged 400+ climbs (about 10 per user)",
+      "70% 30-day retention",
+      "19 of 20 in-app ratings positive",
+      "Per-move body cues took weekly climbs logged from 30 to 70",
     ],
-    next: "Test social accountability (study pairs) and see whether it helps or hurts intrinsic motivation.",
-    links: [
-      { label: "Prototype", href: "#" },
-      { label: "Deck", href: "#" },
-    ],
+    next: "Reach beyond active climbers: make Sendo the way people who have never touched the sport take their first climbs, with form guidance from day one.",
+    links: [{ label: "Live app", href: "https://sendo-five.vercel.app/" }],
   },
   {
-    id: "campus-dining",
-    title: "Dining Hall Wait Times",
-    problem: "Students waste lunch breaks in lines they can't see coming.",
-    tags: ["Data", "SQL", "Dashboard"],
-    result: "↓ 18% peak-hour congestion",
+    id: "3d-gallery",
+    title: "Interactive 3D Object Gallery",
+    problem: "Art is meant to be experienced, but online it's just a flat image on a screen.",
+    tags: ["Hackathon", "Hardware", "Computer Vision"],
+    result: "2nd of 40 teams at RoseHacks 2026",
     cover: "linear-gradient(135deg, #18181b 0%, #27272a 55%, #92400e 150%)",
     problemDetail:
-      "Dining halls have predictable rushes, but students have no way to know them. Everyone arrives at 12:05 and lines back up.",
-    users: "Students on meal plans with tight class schedules; dining staff planning shifts.",
-    role: "[Data analyst + PM — pulled swipe data, built the model, and designed the student-facing view.]",
+      "Seeing art in person is physical: you walk around a piece and look at it from every angle. Online galleries flatten all of that into a static picture, so people who can't be there miss most of the experience.",
+    users: "Artists working in any medium who want to share their work, and onlookers who want to experience it as if they were in the room.",
+    role: "One of a team of 4. I built the BLE connection scripts for our ESP32 Bluetooth remote.",
     approach: [
-      "Analyzed 6 months of anonymized card-swipe data in SQL to find rush patterns.",
-      "Surveyed 150 students on what makes them choose when and where to eat.",
-      "Prototyped a simple “best time to go” view instead of a detailed live chart.",
+      "Set out to make viewing art immersive and physical, even for people who aren't there in person.",
+      "Cut scope to a single interaction, rotating a 3D model, so the team could ship a polished experience in 24 hours.",
+      "Built two ways to control it: a custom Bluetooth remote, and computer vision that tracks the viewer's hands.",
     ],
     solution:
-      "A lightweight web view showing each hall's expected wait for the next two hours, with a single recommendation: “Go to Crossroads at 12:40.”",
-    results: [
-      "↓ 18% peak-hour congestion at participating halls",
-      "Avg. self-reported wait fell from 14 to 9 minutes",
-      "Staff used the same data to shift one worker to the rush window",
-    ],
-    next: "Push a nudge 15 minutes before a student's usual lunch time and measure whether it shifts arrivals.",
-    links: [{ label: "Repo", href: "#" }],
-  },
-  {
-    id: "onboarding-experiment",
-    title: "Onboarding Experiment",
-    problem: "Half of new users never finish setting up a budgeting app.",
-    tags: ["A/B Testing", "Onboarding", "Python"],
-    result: "↑ 21% setup completion",
-    cover: "linear-gradient(135deg, #0a0a0a 0%, #1f1f1f 50%, #b45309 160%)",
-    problemDetail:
-      "A student budgeting app asked for bank linking, categories, and a monthly goal before showing any value. Funnel data showed a 50% drop at the bank-linking step.",
-    users: "College students managing money on their own for the first time.",
-    role: "[Designed the experiment, wrote the analysis in Python, and presented the recommendation.]",
-    approach: [
-      "Mapped the funnel and found the drop-off step.",
-      "Hypothesized that showing value first would make the bank-link ask feel worth it.",
-      "Ran an A/B test: original flow vs. a “see your week in 30 seconds” manual-entry start.",
-    ],
-    solution:
-      "Let users log three recent purchases by hand and see a mini spending summary before asking them to link a bank.",
-    results: [
-      "↑ 21% setup completion (p < 0.05, n ≈ 2,400)",
-      "Bank-link rate held steady among users who finished",
-      "Day-7 retention up 9% in the treatment group",
-    ],
-    next: "Check whether the manual-entry users stay engaged at day 30, or whether the lift fades.",
-    links: [{ label: "Analysis", href: "#" }],
+      "A platform where artists upload work from any medium as a 3D object, and onlookers turn and explore it with either our remote or their own hand movements.",
+    results: ["Placed 2nd of 40 teams at RoseHacks 2026", "Shipped a working hardware + software demo in 24 hours"],
+    links: [{ label: "Devpost", href: "https://devpost.com/software/interactive-3d-object-gallery" }],
   },
 ];
 
