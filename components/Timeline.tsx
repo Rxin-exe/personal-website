@@ -63,11 +63,13 @@ function Item({ entry }: { entry: TimelineEntry }) {
         </div>
         <h3>{entry.title}</h3>
         <p className="timeline-org">{entry.org}</p>
-        <ul>
-          {entry.bullets.map((b) => (
-            <li key={b}>{b}</li>
-          ))}
-        </ul>
+        {entry.bullets && entry.bullets.length > 0 && (
+          <ul>
+            {entry.bullets.map((b) => (
+              <li key={b}>{b}</li>
+            ))}
+          </ul>
+        )}
       </article>
     </li>
   );
