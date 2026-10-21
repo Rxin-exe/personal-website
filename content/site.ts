@@ -5,7 +5,7 @@
 
 export const site = {
   url: "https://ronanwong.vercel.app", // the site's public address, used for link previews
-  title: "Ronan Wong — Product Manager",
+  title: "Ronan Wong Website",
   description:
     "Ronan Wong is an aspiring Product Manager studying Data Science and Cognitive Science at UC Berkeley.",
 };
