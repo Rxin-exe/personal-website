@@ -78,7 +78,9 @@ function ProjectModal({ project: p, onClose }: { project: Project; onClose: () =
 
   return (
     <Modal labelledBy="project-modal-title" onClose={onClose}>
-      <div className="modal-cover" style={{ background: p.cover }} aria-hidden="true" />
+      <div className="modal-cover" style={{ background: p.cover }} aria-hidden="true">
+        {p.image && <img src={p.image} alt="" loading="lazy" decoding="async" />}
+      </div>
       <div className="modal-content">
         <header className="modal-header">
           <span className="tags">

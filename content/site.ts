@@ -116,6 +116,7 @@ export const projects: Project[] = [
     tags: ["0 → 1", "AI / Computer Vision", "A/B Testing"],
     result: "70% 30-day retention",
     cover: "linear-gradient(135deg, #1c1917 0%, #292524 50%, #78350f 140%)",
+    image: "/projects/sendo.jpg",
     problemDetail:
       "Most climbers learn by trial and error. Coaching is expensive and rare, so bad habits stick. In a 100-climber survey, 80% said they had no source of feedback on their form.",
     users: "Recreational climbers who want to progress but don't have regular access to a coach.",
@@ -143,6 +144,7 @@ export const projects: Project[] = [
     tags: ["Hackathon", "Hardware", "Computer Vision"],
     result: "2nd of 40 teams at RoseHacks 2026",
     cover: "linear-gradient(135deg, #18181b 0%, #27272a 55%, #92400e 150%)",
+    image: "/projects/3d-gallery.jpg",
     problemDetail:
       "Seeing art in person is physical: you walk around a piece and look at it from every angle. Online galleries flatten all of that into a static picture, so people who can't be there miss most of the experience.",
     users: "Artists working in any medium who want to share their work, and onlookers who want to experience it as if they were in the room.",
@@ -155,6 +157,7 @@ export const projects: Project[] = [
     solution:
       "A platform where artists upload work from any medium as a 3D object, and onlookers turn and explore it with either our remote or their own hand movements.",
     results: ["Placed 2nd of 40 teams at RoseHacks 2026", "Shipped a working hardware + software demo in 24 hours"],
+    next: "Put it in front of real artists and viewers: test whether hand tracking alone feels natural enough to drop the remote, and add the next interaction people ask for most, such as zoom.",
     links: [{ label: "Devpost", href: "https://devpost.com/software/interactive-3d-object-gallery" }],
   },
 ];
