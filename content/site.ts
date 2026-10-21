@@ -377,6 +377,72 @@ export const breakdowns: Breakdown[] = [
       "Lost ad revenue during free sessions must be offset by conversion gains.",
     ],
   },
+  {
+    id: "strava-climbing",
+    product: "Strava",
+    logo: "St",
+    title: "Strava won runners. Why doesn't it work for climbers?",
+    category: "Expansion",
+    readTime: "5 min read",
+    context: [
+      "Strava is the social network for endurance athletes. Its loop is simple: record an activity, share it, collect kudos, and come back to beat your last effort. For running and cycling, that loop is close to perfect.",
+      "Climbing is one of the fastest-growing sports, especially indoors. Strava lets you log a climb, but the loop that makes it sticky for runners barely works for climbers. As someone building a climbing product, I think that gap is worth a closer look.",
+    ],
+    users: [
+      "Gym climbers: climb a few times a week with friends. Job: “Show me I'm getting better, and let my friends see it too.”",
+      "Multi-sport athletes: already run or ride on Strava. Job: “Keep all my training in one place.”",
+      "Projecting climbers: work one hard problem across many sessions. Job: “Track my attempts until I finally send it.”",
+    ],
+    works: [
+      {
+        point: "Kudos make effort social.",
+        why: "A small, low-cost reaction from friends turns a solo workout into something people notice. That social reward is a big reason people keep recording.",
+      },
+      {
+        point: "Segments create a reason to return.",
+        why: "Leaderboards on a stretch of road give every run a goal and a rival. Progress is visible and comparable.",
+      },
+      {
+        point: "Recording is nearly effortless.",
+        why: "Press start, press stop, and GPS does the rest. The less work logging takes, the more people log.",
+      },
+    ],
+    friction: [
+      {
+        point: "The core metric doesn't fit.",
+        opportunity: "Strava's stats are built around distance, pace, and routes. A climbing session has none of those; what climbers care about is grade, attempts, and whether they sent.",
+      },
+      {
+        point: "There's nothing worth reacting to.",
+        opportunity: "A climb shows up as a time and maybe a heart rate. Friends have little reason to give kudos, so the social loop never starts.",
+      },
+      {
+        point: "No equivalent of segments.",
+        opportunity: "Climbers already compare themselves on the same gym problems, but Strava has no way to represent a specific route or boulder.",
+      },
+    ],
+    recommendation: {
+      feature: "A climbing session logger: tap to log each problem's grade, attempts, and send, then share a session card showing hardest send and a grade pyramid.",
+      rationale: [
+        "Gives climbers the progress signal they actually care about, in the same tap-to-log spirit as Strava's recording.",
+        "Creates something worth giving kudos to, which restarts the social loop.",
+        "Lays the groundwork for a segment-like feature later: shared gym problems with their own send lists.",
+      ],
+    },
+    metrics: {
+      northStar: "Weekly active climbers logging 2+ climbing sessions",
+      supporting: [
+        "Kudos per climbing activity, compared with running activities",
+        "90-day retention of users whose first activity was a climb",
+        "Share of multi-sport users who log at least one climb a month",
+      ],
+    },
+    risks: [
+      "Grades vary between gyms, so comparisons can feel unfair. Keep the focus on personal progress first.",
+      "Manual logging mid-session is friction that GPS never had. It has to take seconds, not minutes.",
+      "Climbing is a smaller market than running; the bet only pays off if it also deepens engagement for multi-sport users.",
+    ],
+  },
 ];
 
 /**
