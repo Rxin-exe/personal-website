@@ -1,34 +1,38 @@
 "use client";
 
-import { useState } from "react";
 import { projects, type Project } from "@/content/site";
+import CopyLink from "./CopyLink";
 import Modal from "./Modal";
-import { tilt } from "./tilt";
 import Reveal from "./Reveal";
 import SectionHead from "./SectionHead";
+import { useHashModal } from "./useHashModal";
 
 export default function Projects() {
-  const [open, setOpen] = useState<Project | null>(null);
+  const { open, show, close } = useHashModal("project", projects, "projects");
 
   return (
     <section id="projects" className="container section" aria-labelledby="projects-title">
-      <SectionHead id="projects" eyebrow="Projects" title="Things I've built" intro="Real problems, real users, measurable outcomes." />
-      <ul className={`grid ${projects.length % 2 === 0 && projects.length % 3 !== 0 ? "grid-2" : ""}`} style={{ listStyle: "none", padding: 0 }}>
+      <SectionHead id="projects" />
+      <ol className="cases">
         {projects.map((p, i) => (
-          <Reveal as="li" key={p.id} delay={i * 90}>
-            <button className="card" onClick={() => setOpen(p)} aria-haspopup="dialog" {...tilt}>
-              <div className="card-cover" style={{ background: p.cover }} aria-hidden={!p.image}>
+          <Reveal as="li" key={p.id}>
+            <button className="case" onClick={() => show(p)} aria-haspopup="dialog">
+              <div className="case-cover" style={{ background: p.cover }} aria-hidden="true">
                 {p.image ? (
                   <img src={p.image} alt="" loading="lazy" decoding="async" />
                 ) : (
-                  <span className="card-cover-label">{p.tags[0]}</span>
+                  <span className="case-cover-mark">{p.title}</span>
                 )}
               </div>
-              <div className="card-body">
+              <div className="case-body">
+                <span className="case-index">Project {String(i + 1).padStart(2, "0")}</span>
                 <h3>{p.title}</h3>
-                <p>{p.problem}</p>
-                <div className="card-foot">
-                  <span className="card-result">{p.result}</span>
+                <p className="case-problem">{p.problem}</p>
+                <div className="case-metric">
+                  <span className="case-metric-value">{p.metric.value}</span>
+                  <span className="case-metric-label">{p.metric.label}</span>
+                </div>
+                <div className="case-foot">
                   <span className="tags">
                     {p.tags.map((t) => (
                       <span key={t} className="tag">
@@ -36,13 +40,16 @@ export default function Projects() {
                       </span>
                     ))}
                   </span>
+                  <span className="case-cta">
+                    View project <span aria-hidden="true">→</span>
+                  </span>
                 </div>
               </div>
             </button>
           </Reveal>
         ))}
-      </ul>
-      {open && <ProjectModal project={open} onClose={() => setOpen(null)} />}
+      </ol>
+      {open && <ProjectModal project={open} onClose={close} />}
     </section>
   );
 }
@@ -78,9 +85,11 @@ function ProjectModal({ project: p, onClose }: { project: Project; onClose: () =
 
   return (
     <Modal labelledBy="project-modal-title" onClose={onClose}>
-      <div className="modal-cover" style={{ background: p.cover }} aria-hidden="true">
-        {p.image && <img src={p.image} alt="" loading="lazy" decoding="async" />}
-      </div>
+      {p.image && (
+        <div className="modal-cover" style={{ background: p.cover }} aria-hidden="true">
+          <img src={p.image} alt="" loading="lazy" decoding="async" />
+        </div>
+      )}
       <div className="modal-content">
         <header className="modal-header">
           <span className="tags">
@@ -92,6 +101,13 @@ function ProjectModal({ project: p, onClose }: { project: Project; onClose: () =
           </span>
           <h2 id="project-modal-title">{p.title}</h2>
           <p className="modal-lede">{p.problem}</p>
+          <div className="modal-meta">
+            <div className="case-metric">
+              <span className="case-metric-value">{p.metric.value}</span>
+              <span className="case-metric-label">{p.metric.label}</span>
+            </div>
+            <CopyLink />
+          </div>
         </header>
         {sections.map((s, i) => (
           <section key={s.title} className="prose-section">

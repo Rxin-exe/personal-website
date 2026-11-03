@@ -5,7 +5,7 @@ import SectionHead from "./SectionHead";
 export default function About() {
   return (
     <section id="about" className="container section" aria-labelledby="about-title">
-      <SectionHead id="about" eyebrow="About" title="Data meets how people think." />
+      <SectionHead id="about" />
       <div className="about-grid">
         <Reveal className="about-copy">
           {profile.about.map((p) => (
@@ -13,7 +13,7 @@ export default function About() {
           ))}
         </Reveal>
         <Reveal className="strengths" delay={120}>
-          <h3>Strengths</h3>
+          <h3>Toolkit</h3>
           <ul className="tags" style={{ listStyle: "none", padding: 0 }}>
             {profile.strengths.map((s) => (
               <li key={s} className="tag">

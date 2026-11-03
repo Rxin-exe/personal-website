@@ -7,6 +7,7 @@ export default function Nav() {
   const [active, setActive] = useState("");
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [shortcut, setShortcut] = useState("⌘K");
 
   useEffect(() => {
     const onScroll = () => {
@@ -34,6 +35,10 @@ export default function Nav() {
   }, []);
 
   useEffect(() => {
+    if (!/Mac|iPhone|iPad/.test(navigator.platform)) setShortcut("Ctrl K");
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
     window.addEventListener("keydown", onKey);
@@ -46,6 +51,19 @@ export default function Nav() {
         <a href="#top" className="logo" aria-label={`${profile.name}, back to top`}>
           {profile.initials}
         </a>
+        <button
+          type="button"
+          className="nav-jump"
+          onClick={() => window.dispatchEvent(new Event("open-command-menu"))}
+          aria-label="Jump to a section or project"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <span className="nav-jump-label">Jump to</span>
+          <kbd>{shortcut}</kbd>
+        </button>
         <button
           className="nav-toggle"
           aria-expanded={open}

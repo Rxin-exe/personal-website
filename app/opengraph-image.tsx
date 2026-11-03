@@ -19,7 +19,7 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "0 96px",
-          background: "linear-gradient(180deg, #000000 0%, #0a0a0a 55%, #141414 100%)",
+          background: "linear-gradient(180deg, #1B2450 0%, #171F44 55%, #121838 100%)",
           color: "#fafafa",
           position: "relative",
         }}
@@ -44,18 +44,18 @@ export default function OpengraphImage() {
                 width: 4,
                 height: 4,
                 borderRadius: 2,
-                background: i % 26 > 15 && i % 26 < 21 && i > 52 ? "#f59e0b" : "#3f3f46",
+                background: i % 26 > 15 && i % 26 < 21 && i > 52 ? "#74FFED" : "#3A4578",
               }}
             />
           ))}
         </div>
-        <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: "#f59e0b", marginBottom: 28 }}>
+        <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: "#74FFED", marginBottom: 28 }}>
           {profile.initials}
         </div>
         <div style={{ display: "flex", fontSize: 92, fontWeight: 600, letterSpacing: -3, lineHeight: 1 }}>
           {profile.name}
         </div>
-        <div style={{ display: "flex", fontSize: 34, color: "#a1a1aa", marginTop: 28, maxWidth: 900 }}>
+        <div style={{ display: "flex", fontSize: 34, color: "#A3ADCF", marginTop: 28, maxWidth: 900 }}>
           {profile.headline}
         </div>
       </div>

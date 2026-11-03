@@ -8,6 +8,7 @@ export const site = {
   title: "Ronan Wong Website",
   description:
     "Ronan Wong is an aspiring Product Manager studying Data Science and Cognitive Science at UC Berkeley.",
+  updated: "Nov 2026", // shown in the hero panel and footer; bump it when you edit the site
 };
 
 export const profile = {
@@ -18,7 +19,15 @@ export const profile = {
   photoAlt: "Portrait of Ronan Wong",
   headline: "Product Manager · Data Science & Cognitive Science @ UC Berkeley",
   valueStatement:
-    "I combine data and an understanding of how people think to build products users actually love.",
+    "I'm building Sendo, an AI form coach for climbers, and shipping product at Cal Hockey. Before that I automated mortgage workflows with data science at Outamation.",
+  /** The "at a glance" panel beside the hero. `href` makes a row a link; `live` adds the status dot. */
+  glance: [
+    { label: "Status", value: "Open to PM / APM internships, Summer 2027", live: true },
+    { label: "Studying", value: "Data Science + Cognitive Science, UC Berkeley" },
+    { label: "Building", value: "Sendo, an AI form coach for climbers", href: "#project/sendo" },
+    { label: "Working", value: "Product & Software Engineering Intern, Cal Hockey" },
+    { label: "Best metric", value: "70% 30-day retention on Sendo", href: "#project/sendo" },
+  ] as { label: string; value: string; href?: string; live?: boolean }[],
   about: [
     "I started out studying Computer Science at Mt. San Antonio College, where I learned to break problems into pieces and build things that work. I then transferred to UC Berkeley, where I now study Data Science and Cognitive Science.",
     "I found product at the intersection of data and human behavior: understanding what users do, why they do it, and how to build for it. Working with students with disabilities taught me to build with care for people whose needs are easy to overlook, and research showed me how much I love talking with people and understanding their problems up close. Product is where I bring that attentive perspective.",
@@ -77,7 +86,7 @@ export type Project = {
   title: string;
   problem: string;
   tags: string[];
-  result: string;
+  metric: { value: string; label: string }; // the headline number on the card
   cover: string; // CSS gradient, or swap for an image path via `image`
   image?: string;
   problemDetail: string;
@@ -96,8 +105,8 @@ export const projects: Project[] = [
     title: "Sendo",
     problem: "Climbers improve slowly because almost no one gets feedback on their form.",
     tags: ["0 → 1", "AI / Computer Vision", "A/B Testing"],
-    result: "70% 30-day retention",
-    cover: "linear-gradient(135deg, #1c1917 0%, #292524 50%, #78350f 140%)",
+    metric: { value: "70%", label: "30-day retention across 40+ beta climbers" },
+    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
     image: "/projects/sendo.jpg",
     problemDetail:
       "Most climbers learn by trial and error. Coaching is expensive and rare, so bad habits stick. In a 100-climber survey, 80% said they had no source of feedback on their form.",
@@ -120,12 +129,40 @@ export const projects: Project[] = [
     links: [{ label: "Live app", href: "https://sendo-five.vercel.app/" }],
   },
   {
+    id: "forgeai",
+    title: "ForgeAI",
+    problem: "Engineers can design a part in an afternoon, then wait days to find out what it costs to make.",
+    tags: ["Hackathon", "3D / CAD", "Voice AI"],
+    metric: { value: "STL → $", label: "CAD file to price, budget check and spoken invoice in one flow" },
+    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
+    problemDetail:
+      "One of our teammates is a mechanical engineer who kept hitting the same wall: design software knows everything about a part's geometry and nothing about its cost. Stock had to be sized by hand, machining time estimated, quotes chased, and the total checked against a budget that was already partly spent.",
+    users: "Mechanical engineers and small manufacturing teams who need to know what a part will cost, and whether the budget can cover it, before they commit.",
+    role: "One of a team of 3 at Cal Hacks 13.0, with Vincent Ly and Tao Tokikawa.",
+    approach: [
+      "Started from a teammate's real, repeated pain instead of a technology looking for a use.",
+      "Cut a huge first feature list (supplier search, approval workflows, banking integrations) down to one question: what does this part cost, and can we afford it? Integrations that didn't serve that got cut, even ones that worked.",
+      "Kept the hard research problems, like predicting machining time, as explicit, editable inputs with labeled assumptions rather than overclaiming.",
+      "Added mesh checks and a fallback 3D viewer so a bad file or a machine without WebGL warns the user instead of silently showing a wrong number or a blank box.",
+    ],
+    solution:
+      "Upload an STL and ForgeAI measures the part, prices it for CNC milling or FDM printing, and shows how unit cost falls with quantity. It checks the order against your balance, upcoming commitments and a protected reserve, tells you the largest quantity you can afford, then generates itemized invoices read aloud with Cartesia's voice AI.",
+    results: [
+      "A complete flow from STL upload to price, budget decision and spoken invoice",
+      "Invoice line items trace back to the part's real geometry, not hard-coded numbers",
+      "Cost model works in whole cents and is covered by unit tests",
+      "Every estimate shows its assumptions, and the app labels what is measured versus simulated",
+    ],
+    next: "Connect the voice agent to a phone line so customers can confirm an invoice in a live call, and replace assumed rates with live supplier quotes and lead times.",
+    links: [{ label: "Devpost", href: "https://devpost.com/software/forgeai-6l3j8o" }],
+  },
+  {
     id: "3d-gallery",
     title: "Interactive 3D Object Gallery",
     problem: "Art is meant to be experienced, but online it's just a flat image on a screen.",
     tags: ["Hackathon", "Hardware", "Computer Vision"],
-    result: "2nd of 40 teams at RoseHacks 2026",
-    cover: "linear-gradient(135deg, #18181b 0%, #27272a 55%, #92400e 150%)",
+    metric: { value: "2nd", label: "of 40 teams at RoseHacks 2026, built in 24 hours" },
+    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
     image: "/projects/3d-gallery.jpg",
     problemDetail:
       "Seeing art in person is physical: you walk around a piece and look at it from every angle. Online galleries flatten all of that into a static picture, so people who can't be there miss most of the experience.",
@@ -432,33 +469,44 @@ export const breakdowns: Breakdown[] = [
   },
 ];
 
-/**
- * Live A/B test on the hero's primary button. Results show near the footer.
- * Changing `id` starts a fresh experiment with new counters.
- */
-export const experiment = {
-  id: "hero-cta-v1",
-  hypothesis:
-    "Framing the button around how I think (B) will get more clicks than naming the section (A).",
-  metric: "Click-through on the hero's primary button, one count per visitor.",
-  variants: {
-    A: "View my breakdowns",
-    B: "See how I think",
-  },
-};
-
 export const contact = {
-  heading: "Let's build something.",
-  line: "I'm actively looking for PM opportunities. Always happy to chat about products.",
   email: "ronanwong@berkeley.edu",
   linkedin: "https://www.linkedin.com/in/ronanwong",
   resume: "/Ronan_Wong_Resume.pdf", // phone number and grad date removed
 };
 
-export const nav = [
-  { id: "about", label: "About" },
-  { id: "timeline", label: "Timeline" },
-  { id: "projects", label: "Projects" },
-  { id: "breakdowns", label: "Breakdowns" },
-  { id: "contact", label: "Contact" },
-];
+type SectionCopy = { index: string; label: string; title: string; intro?: string };
+
+/** Headings for each section, in page order. The nav is built from this. */
+export const sections: Record<"about" | "timeline" | "projects" | "breakdowns" | "contact", SectionCopy> = {
+  about: {
+    index: "01",
+    label: "About",
+    title: "From CS at Mt. SAC to product at Berkeley.",
+  },
+  timeline: {
+    index: "02",
+    label: "Experience",
+    title: "Education & experience",
+  },
+  projects: {
+    index: "03",
+    label: "Projects",
+    title: "Three products, start to finish.",
+    intro: "From the first user interview to the numbers after launch. Each one opens as a full write-up with its own shareable link.",
+  },
+  breakdowns: {
+    index: "04",
+    label: "Breakdowns",
+    title: "Teardowns of products I use.",
+    intro: "Duolingo, Notion, Spotify and Strava: what works, where it breaks, and the one thing I'd ship next.",
+  },
+  contact: {
+    index: "05",
+    label: "Contact",
+    title: "Hiring for Summer 2027?",
+    intro: "I'm looking for PM and APM internships. Email me, or grab my resume.",
+  },
+};
+
+export const nav = (Object.keys(sections) as (keyof typeof sections)[]).map((id) => ({ id, label: sections[id].label }));

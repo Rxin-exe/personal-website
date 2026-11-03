@@ -13,6 +13,7 @@ const FOCUSABLE = 'a[href], button:not([disabled]), input, select, textarea, [ta
 
 export default function Modal({ labelledBy, onClose, children }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
 
@@ -51,9 +52,19 @@ export default function Modal({ labelledBy, onClose, children }: Props) {
     };
   }, []);
 
+  // Reading progress: how far through the write-up the visitor has scrolled.
+  const onScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    const max = el.scrollHeight - el.clientHeight;
+    progressRef.current?.style.setProperty("--read", String(max > 0 ? el.scrollTop / max : 1));
+  };
+
   return createPortal(
+    <>
+    <div ref={progressRef} className="modal-progress" aria-hidden="true" />
     <div
       className="modal-backdrop"
+      onScroll={onScroll}
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -66,7 +77,8 @@ export default function Modal({ labelledBy, onClose, children }: Props) {
         </button>
         {children}
       </div>
-    </div>,
+    </div>
+    </>,
     document.body
   );
 }

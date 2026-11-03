@@ -4,7 +4,7 @@ import { profile } from "@/content/site";
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-// Browser-tab icon: amber initials on black.
+// Browser-tab icon: aqua initials on black.
 export default function Icon() {
   return new ImageResponse(
     (
@@ -15,9 +15,9 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#000000",
+          background: "#171F44",
           borderRadius: 14,
-          color: "#f59e0b",
+          color: "#74FFED",
           fontSize: 30,
           fontWeight: 700,
           letterSpacing: -1,

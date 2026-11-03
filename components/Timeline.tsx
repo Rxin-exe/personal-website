@@ -35,7 +35,7 @@ export default function Timeline() {
 
   return (
     <section id="timeline" className="container section" aria-labelledby="timeline-title">
-      <SectionHead id="timeline" eyebrow="Timeline" title="Education & experience" />
+      <SectionHead id="timeline" />
       <div ref={listRef} className="timeline">
         <div className="timeline-track" aria-hidden="true" />
         <div className="timeline-progress" aria-hidden="true" />

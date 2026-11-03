@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
-import { experiment, profile, site } from "@/content/site";
+import { Inter, JetBrains_Mono } from "next/font/google";
+import { profile, site } from "@/content/site";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
+const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -24,19 +25,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#171F44",
   colorScheme: "dark",
 };
 
-// Picks (or recalls) this visitor's A/B variant before first paint, so the button never flickers.
-const assignVariant = `(function(){var k="ab:${experiment.id}",v;try{v=localStorage.getItem(k)}catch(e){}if(v!=="A"&&v!=="B"){v=Math.random()<0.5?"A":"B";try{localStorage.setItem(k,v)}catch(e){}}document.documentElement.setAttribute("data-ab",v)})()`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: assignVariant }} />
-      </head>
+    <html lang="en" className={`${inter.variable} ${mono.variable}`}>
       <body>{children}</body>
     </html>
   );

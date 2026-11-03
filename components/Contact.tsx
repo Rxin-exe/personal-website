@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { contact } from "@/content/site";
+import { contact, sections } from "@/content/site";
 import Reveal from "./Reveal";
 
 export default function Contact() {
@@ -30,11 +30,17 @@ export default function Contact() {
   return (
     <section id="contact" className="container section" aria-labelledby="contact-title">
       <Reveal className="contact">
-        <span className="eyebrow">Contact</span>
-        <h2 id="contact-title" className="section-title">
-          {contact.heading}
-        </h2>
-        <p className="section-intro">{contact.line}</p>
+        <div className="contact-copy">
+          <p className="section-index">
+            <span className="section-num">{sections.contact.index}</span>
+            {sections.contact.label}
+          </p>
+          <h2 id="contact-title" className="section-title">
+            {sections.contact.title}
+          </h2>
+          <p className="section-intro">{sections.contact.intro}</p>
+        </div>
+        <div className="contact-side">
         <div className="email-row">
           <a href={`mailto:${contact.email}`}>{contact.email}</a>
           <button className="btn btn-primary btn-sm" onClick={copy}>
@@ -55,6 +61,7 @@ export default function Contact() {
             </svg>
             LinkedIn
           </a>
+        </div>
         </div>
       </Reveal>
       <div className={`toast ${copied ? "is-visible" : ""}`} role="status" aria-live="polite">

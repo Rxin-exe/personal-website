@@ -1,23 +1,23 @@
 "use client";
 
-import { useState } from "react";
 import { breakdowns, type Breakdown } from "@/content/site";
 import { brandIcons } from "./brandIcons";
+import CopyLink from "./CopyLink";
 import Modal from "./Modal";
-import { tilt } from "./tilt";
 import Reveal from "./Reveal";
 import SectionHead from "./SectionHead";
+import { useHashModal } from "./useHashModal";
 
 export default function Breakdowns() {
-  const [open, setOpen] = useState<Breakdown | null>(null);
+  const { open, show, close } = useHashModal("breakdown", breakdowns, "breakdowns");
 
   return (
     <section id="breakdowns" className="container section" aria-labelledby="breakdowns-title">
-      <SectionHead id="breakdowns" eyebrow="Product Breakdowns" title="How I think about products." intro="Teardowns of products people love: what works, what breaks, and what I'd build next." />
+      <SectionHead id="breakdowns" />
       <ul className={`grid ${breakdowns.length % 2 === 0 && breakdowns.length % 3 !== 0 ? "grid-2" : ""}`} style={{ listStyle: "none", padding: 0 }}>
         {breakdowns.map((b, i) => (
           <Reveal as="li" key={b.id} delay={i * 90}>
-            <button className="card" onClick={() => setOpen(b)} aria-haspopup="dialog" {...tilt}>
+            <button className="card" onClick={() => show(b)} aria-haspopup="dialog">
               <div className="card-body">
                 <div className="breakdown-head">
                   <LogoMark breakdown={b} />
@@ -26,7 +26,7 @@ export default function Breakdowns() {
                 <h3>{b.title}</h3>
                 <div className="card-foot">
                   <div className="breakdown-meta">
-                    <span className="tag">{b.category}</span>
+                    <span>{b.category}</span>
                     <span>{b.readTime}</span>
                   </div>
                 </div>
@@ -35,7 +35,7 @@ export default function Breakdowns() {
           </Reveal>
         ))}
       </ul>
-      {open && <BreakdownModal breakdown={open} onClose={() => setOpen(null)} />}
+      {open && <BreakdownModal breakdown={open} onClose={close} />}
     </section>
   );
 }
@@ -140,7 +140,10 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
             </span>
           </div>
           <h2 id="breakdown-modal-title">{b.title}</h2>
-          <span className="tag">{b.category}</span>
+          <div className="modal-meta">
+            <span className="tag">{b.category}</span>
+            <CopyLink />
+          </div>
         </header>
         {sections.map((s, i) => (
           <section key={s.title} className="prose-section">

@@ -6,8 +6,7 @@ import Projects from "@/components/Projects";
 import Breakdowns from "@/components/Breakdowns";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import ExperimentStrip from "@/components/ExperimentStrip";
-import CursorGlow from "@/components/CursorGlow";
+import CommandMenu from "@/components/CommandMenu";
 
 export default function Home() {
   return (
@@ -15,8 +14,6 @@ export default function Home() {
       <a className="skip-link" href="#main">
         Skip to content
       </a>
-      <div className="bg" aria-hidden="true" />
-      <CursorGlow />
       <Nav />
       <main id="main">
         <Hero />
@@ -25,9 +22,9 @@ export default function Home() {
         <Projects />
         <Breakdowns />
         <Contact />
-        <ExperimentStrip />
       </main>
       <Footer />
+      <CommandMenu />
     </>
   );
 }

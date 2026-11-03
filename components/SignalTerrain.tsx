@@ -5,14 +5,14 @@ import { useEffect, useRef } from "react";
 /**
  * A perspective dot-grid terrain under the hero. Each dot carries a little random
  * jitter, so the surface reads as noisy data. Under the cursor, the noise resolves
- * into signal: dots settle onto a clean fitted slope and turn amber. Moving sends small ripples; clicking sends a big one.
+ * into signal: dots settle onto a clean fitted slope and turn aqua. Moving sends small ripples; clicking sends a big one.
  * Plain canvas 2D with a hand-rolled camera; no 3D library.
  */
 
 type Ripple = { x: number; z: number; t0: number; amp: number };
 
-const AMBER = "245, 158, 11";
-const WHITE = "250, 250, 250";
+const AQUA = "116, 255, 237";
+const WHITE = "226, 232, 255";
 const ALPHA_STEPS = 10;
 
 export default function SignalTerrain() {
@@ -156,7 +156,7 @@ export default function SignalTerrain() {
     const pt = { x: 0, y: 0, s: 0 };
     const buckets = {
       white: Array.from({ length: ALPHA_STEPS }, () => [] as number[]),
-      amber: Array.from({ length: ALPHA_STEPS }, () => [] as number[]),
+      aqua: Array.from({ length: ALPHA_STEPS }, () => [] as number[]),
     };
 
     const draw = () => {
@@ -180,7 +180,7 @@ export default function SignalTerrain() {
 
       ctx.clearRect(0, 0, width, height);
       for (const b of buckets.white) b.length = 0;
-      for (const b of buckets.amber) b.length = 0;
+      for (const b of buckets.aqua) b.length = 0;
 
       for (let i = 0; i < n; i++) {
         const x = gx[i];
@@ -208,10 +208,10 @@ export default function SignalTerrain() {
 
         const size = Math.max(1.1, pt.s * (small ? 5 : 6.5)) * (1 + w * 0.6);
         const bucket = Math.min(ALPHA_STEPS - 1, Math.floor(alpha * ALPHA_STEPS));
-        (w > 0.35 ? buckets.amber : buckets.white)[bucket].push(pt.x - size / 2, pt.y - size / 2, size);
+        (w > 0.35 ? buckets.aqua : buckets.white)[bucket].push(pt.x - size / 2, pt.y - size / 2, size);
       }
 
-      for (const [name, rgb] of [["white", WHITE], ["amber", AMBER]] as const) {
+      for (const [name, rgb] of [["white", WHITE], ["aqua", AQUA]] as const) {
         buckets[name].forEach((list, step) => {
           if (!list.length) return;
           ctx.fillStyle = `rgba(${rgb}, ${(step + 1) / ALPHA_STEPS})`;
