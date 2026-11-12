@@ -1,61 +1,36 @@
-import { contact, profile, site } from "@/content/site";
-import HeroParticles from "./HeroParticles";
-
-const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as React.CSSProperties;
+import { contact, profile } from "@/content/site";
+import DitherScene from "./DitherScene";
+import { ArrowDown } from "./icons";
 
 export default function Hero() {
   return (
-    <section id="top" className="container hero" aria-labelledby="hero-name">
-      <HeroParticles />
-      <div className="hero-grid">
-        <div className="hero-main">
-          {profile.showPhoto && (
-            <div className="hero-photo hero-item" style={delay(0)}>
-              <img src={profile.photo} alt={profile.photoAlt} width={120} height={120} fetchPriority="high" />
-            </div>
-          )}
-          <h1 id="hero-name" className="hero-name hero-item" style={delay(80)}>
-            {profile.name}
-          </h1>
-          <p className="hero-headline hero-item" style={delay(160)}>
-            {profile.headline}
-          </p>
-          <p className="hero-value hero-item" style={delay(240)}>
-            {profile.valueStatement}
-          </p>
-          <div className="hero-actions hero-item" style={delay(320)}>
-            <a href="#projects" className="btn btn-primary">
-              See my projects
-            </a>
-            <a href={`mailto:${contact.email}`} className="btn btn-secondary">
-              Email me
-            </a>
-          </div>
+    <section id="top" className="hero" aria-labelledby="hero-name">
+      <DitherScene scene="summit" />
+      <div className="container hero-inner">
+        <div className="hero-copy">
+        <p className="hero-status">
+          <span className="status-dot" aria-hidden="true" />
+          {profile.status}
+        </p>
+        <h1 id="hero-name" className="hero-name" aria-label={profile.name}>
+          {/* One span per letter, so the entrance can print the name a letter at a time. */}
+          {[...profile.name].map((ch, i) => (
+            <span key={i} aria-hidden="true" style={{ "--i": i } as React.CSSProperties}>
+              {ch}
+            </span>
+          ))}
+        </h1>
+        <p className="hero-bio">{profile.bio}</p>
+        <div className="hero-actions">
+          <a href={`mailto:${contact.email}`} className="btn btn-primary">
+            Email me
+          </a>
+          <a href={contact.resume} className="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+            Resume
+            <ArrowDown />
+          </a>
         </div>
-
-        <aside className="glance hero-item" style={delay(420)} aria-labelledby="glance-title">
-          <div className="glance-head">
-            <span id="glance-title">At a glance</span>
-            <span>Updated {site.updated}</span>
-          </div>
-          <dl className="glance-list">
-            {profile.glance.map((row) => (
-              <div key={row.label} className="glance-row">
-                <dt>{row.label}</dt>
-                <dd>
-                  {row.live && <span className="status-dot" aria-hidden="true" />}
-                  {row.href ? (
-                    <a href={row.href}>
-                      {row.value} <span aria-hidden="true">→</span>
-                    </a>
-                  ) : (
-                    row.value
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </aside>
+        </div>
       </div>
     </section>
   );

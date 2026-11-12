@@ -1,19 +1,16 @@
 import { sections } from "@/content/site";
-import Reveal from "./Reveal";
+import DitherScene from "./DitherScene";
 
-/** Numbered section label, title and optional intro, all from `sections` in content/site.ts. */
-export default function SectionHead({ id }: { id: keyof typeof sections }) {
+/** Section title, optional intro, and the dithered horizon line that echoes the hero. */
+export default function SectionHead({ id }: { id: "experience" | "projects" | "breakdowns" }) {
   const s = sections[id];
   return (
-    <Reveal className="section-head">
-      <p className="section-index">
-        <span className="section-num">{s.index}</span>
-        {s.label}
-      </p>
+    <div className="section-head">
       <h2 id={`${id}-title`} className="section-title">
         {s.title}
       </h2>
       {s.intro && <p className="section-intro">{s.intro}</p>}
-    </Reveal>
+      <DitherScene scene="rule" className="section-rule" />
+    </div>
   );
 }

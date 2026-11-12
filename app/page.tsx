@@ -1,12 +1,10 @@
 import Nav from "@/components/Nav";
 import Hero from "@/components/Hero";
-import About from "@/components/About";
-import Timeline from "@/components/Timeline";
+import Experience from "@/components/Experience";
 import Projects from "@/components/Projects";
 import Breakdowns from "@/components/Breakdowns";
 import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
-import CommandMenu from "@/components/CommandMenu";
 
 export default function Home() {
   return (
@@ -17,14 +15,12 @@ export default function Home() {
       <Nav />
       <main id="main">
         <Hero />
-        <About />
-        <Timeline />
+        <Experience />
         <Projects />
         <Breakdowns />
         <Contact />
       </main>
       <Footer />
-      <CommandMenu />
     </>
   );
 }

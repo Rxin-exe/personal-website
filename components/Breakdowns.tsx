@@ -4,9 +4,10 @@ import { breakdowns, type Breakdown } from "@/content/site";
 import { brandIcons } from "./brandIcons";
 import CopyLink from "./CopyLink";
 import Modal from "./Modal";
-import Reveal from "./Reveal";
+import PixelLogo from "./PixelLogo";
 import SectionHead from "./SectionHead";
 import { useHashModal } from "./useHashModal";
+import { coverWipe, revealWipe } from "@/lib/wipe";
 
 export default function Breakdowns() {
   const { open, show, close } = useHashModal("breakdown", breakdowns, "breakdowns");
@@ -14,25 +15,33 @@ export default function Breakdowns() {
   return (
     <section id="breakdowns" className="container section" aria-labelledby="breakdowns-title">
       <SectionHead id="breakdowns" />
-      <ul className={`grid ${breakdowns.length % 2 === 0 && breakdowns.length % 3 !== 0 ? "grid-2" : ""}`} style={{ listStyle: "none", padding: 0 }}>
-        {breakdowns.map((b, i) => (
-          <Reveal as="li" key={b.id} delay={i * 90}>
-            <button className="card" onClick={() => show(b)} aria-haspopup="dialog">
-              <div className="card-body">
-                <div className="breakdown-head">
-                  <LogoMark breakdown={b} />
-                  <span className="breakdown-product">{b.product}</span>
-                </div>
-                <h3>{b.title}</h3>
-                <div className="card-foot">
-                  <div className="breakdown-meta">
-                    <span>{b.category}</span>
-                    <span>{b.readTime}</span>
-                  </div>
-                </div>
-              </div>
+      <ul className="teardowns">
+        {breakdowns.map((b) => (
+          <li key={b.id}>
+            <button
+              className="teardown"
+              aria-haspopup="dialog"
+              onClick={async (e) => {
+                // Wipe out from the click (or the row's centre, for keyboard users).
+                const r = e.currentTarget.getBoundingClientRect();
+                const x = e.clientX || r.left + r.width / 2;
+                const y = e.clientY || r.top + r.height / 2;
+                await coverWipe(x, y);
+                show(b);
+                requestAnimationFrame(() => revealWipe());
+              }}
+            >
+              <span className="teardown-top">
+                <PixelLogo path={b.icon ? brandIcons[b.icon] : undefined} fallback={b.logo} />
+                <span className="teardown-product">{b.product}</span>
+              </span>
+              <span className="teardown-title">{b.title}</span>
+              <span className="teardown-foot">
+                <span className="teardown-cta">Read the teardown</span>
+                <span className="teardown-meta">{b.readTime}</span>
+              </span>
             </button>
-          </Reveal>
+          </li>
         ))}
       </ul>
       {open && <BreakdownModal breakdown={open} onClose={close} />}
@@ -41,14 +50,11 @@ export default function Breakdowns() {
 }
 
 function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClose: () => void }) {
-  const sections: { title: string; body: React.ReactNode }[] = [
+  const body: { title: string; content: React.ReactNode }[] = [
+    { title: "Context", content: b.context.map((p) => <p key={p}>{p}</p>) },
     {
-      title: "The Product & Context",
-      body: b.context.map((p) => <p key={p}>{p}</p>),
-    },
-    {
-      title: "Target Users & Jobs-to-be-Done",
-      body: (
+      title: "Who uses it, and for what",
+      content: (
         <ul>
           {b.users.map((u) => {
             const [who, ...rest] = u.split(": ");
@@ -62,8 +68,8 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       ),
     },
     {
-      title: "What Works (and why)",
-      body: (
+      title: "What works",
+      content: (
         <ul>
           {b.works.map((w) => (
             <li key={w.point}>
@@ -74,8 +80,8 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       ),
     },
     {
-      title: "Friction Points & Opportunities",
-      body: (
+      title: "Where it breaks",
+      content: (
         <ul>
           {b.friction.map((f) => (
             <li key={f.point}>
@@ -86,13 +92,10 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       ),
     },
     {
-      title: "My Recommendation",
-      body: (
+      title: "What I'd ship",
+      content: (
         <>
-          <div className="callout">
-            <span className="callout-label">Top priority</span>
-            <p>{b.recommendation.feature}</p>
-          </div>
+          <p className="callout">{b.recommendation.feature}</p>
           <ul>
             {b.recommendation.rationale.map((r) => (
               <li key={r}>{r}</li>
@@ -102,13 +105,10 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       ),
     },
     {
-      title: "Success Metrics",
-      body: (
+      title: "How I'd measure it",
+      content: (
         <>
-          <div className="callout">
-            <span className="callout-label">North star</span>
-            <p>{b.metrics.northStar}</p>
-          </div>
+          <p className="callout">{b.metrics.northStar}</p>
           <ul>
             {b.metrics.supporting.map((m) => (
               <li key={m}>{m}</li>
@@ -118,8 +118,8 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
       ),
     },
     {
-      title: "Risks & Tradeoffs",
-      body: (
+      title: "Risks",
+      content: (
         <ul>
           {b.risks.map((r) => (
             <li key={r}>{r}</li>
@@ -133,43 +133,21 @@ function BreakdownModal({ breakdown: b, onClose }: { breakdown: Breakdown; onClo
     <Modal labelledBy="breakdown-modal-title" onClose={onClose}>
       <article className="modal-content">
         <header className="modal-header">
-          <div className="breakdown-head">
-            <LogoMark breakdown={b} />
-            <span className="breakdown-product">
-              {b.product} · {b.readTime}
-            </span>
-          </div>
+          <p className="card-context">
+            {b.product} {b.category.toLowerCase()} teardown, {b.readTime}
+          </p>
           <h2 id="breakdown-modal-title">{b.title}</h2>
-          <div className="modal-meta">
-            <span className="tag">{b.category}</span>
+          <div className="modal-actions">
             <CopyLink />
           </div>
         </header>
-        {sections.map((s, i) => (
+        {body.map((s) => (
           <section key={s.title} className="prose-section">
-            <h3>
-              <span className="prose-num">{String(i + 1).padStart(2, "0")}</span>
-              {s.title}
-            </h3>
-            {s.body}
+            <h3>{s.title}</h3>
+            {s.content}
           </section>
         ))}
       </article>
     </Modal>
-  );
-}
-
-function LogoMark({ breakdown: b }: { breakdown: Breakdown }) {
-  const path = b.icon ? brandIcons[b.icon] : undefined;
-  return (
-    <span className="logo-mark" aria-hidden="true">
-      {path ? (
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-          <path d={path} />
-        </svg>
-      ) : (
-        b.logo
-      )}
-    </span>
   );
 }

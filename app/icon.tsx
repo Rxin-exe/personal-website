@@ -1,30 +1,15 @@
 import { ImageResponse } from "next/og";
-import { profile } from "@/content/site";
+import { summitIcon } from "@/lib/iconScene";
 
 export const size = { width: 64, height: 64 };
 export const contentType = "image/png";
 
-// Browser-tab icon: aqua initials on black.
+// Browser-tab icon: the climber on the summit at sunset, in pixels.
 export default function Icon() {
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#171F44",
-          borderRadius: 14,
-          color: "#74FFED",
-          fontSize: 30,
-          fontWeight: 700,
-          letterSpacing: -1,
-        }}
-      >
-        {profile.initials}
-      </div>
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={summitIcon(32, 2)} width={64} height={64} alt="" style={{ borderRadius: 12 }} />
     ),
     size
   );

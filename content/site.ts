@@ -14,81 +14,75 @@ export const site = {
 export const profile = {
   name: "Ronan Wong",
   initials: "RW",
-  showPhoto: false, // set to true to show the photo in the hero
-  photo: "/profile.svg", // [PHOTO_URL] — drop a square photo in /public and point to it
-  photoAlt: "Portrait of Ronan Wong",
-  headline: "Product Manager · Data Science & Cognitive Science @ UC Berkeley",
-  valueStatement:
-    "I'm building Sendo, an AI form coach for climbers, and shipping product at Cal Hockey. Before that I automated mortgage workflows with data science at Outamation.",
-  /** The "at a glance" panel beside the hero. `href` makes a row a link; `live` adds the status dot. */
-  glance: [
-    { label: "Status", value: "Open to PM / APM internships, Summer 2027", live: true },
-    { label: "Studying", value: "Data Science + Cognitive Science, UC Berkeley" },
-    { label: "Building", value: "Sendo, an AI form coach for climbers", href: "#project/sendo" },
-    { label: "Working", value: "Product & Software Engineering Intern, Cal Hockey" },
-    { label: "Best metric", value: "70% 30-day retention on Sendo", href: "#project/sendo" },
-  ] as { label: string; value: string; href?: string; live?: boolean }[],
-  about: [
-    "I started out studying Computer Science at Mt. San Antonio College, where I learned to break problems into pieces and build things that work. I then transferred to UC Berkeley, where I now study Data Science and Cognitive Science.",
-    "I found product at the intersection of data and human behavior: understanding what users do, why they do it, and how to build for it. Working with students with disabilities taught me to build with care for people whose needs are easy to overlook, and research showed me how much I love talking with people and understanding their problems up close. Product is where I bring that attentive perspective.",
-    "I'm an AI-native builder: I prototype rapidly and relentlessly, making apps that build community, support learning, and create real impact. I'm currently looking for PM and APM internships for Summer 2027.",
-  ],
-  strengths: [
-    "Data Analysis",
-    "SQL",
-    "Python",
-    "User Research",
-    "Behavioral Insights",
-    "Experiment Design",
-    "AI Prototyping",
-    "Rapid Prototyping",
-    "Accessibility",
-  ],
+  status: "Open to PM / APM internships, Summer 2027",
+  /** The description under your name: the main text of the hero. */
+  bio: "Data Science + Cognitive Science at UC Berkeley. I'm building Sendo, an AI form coach for climbers, and working on product at Cal Hockey.",
 };
 
-export type TimelineEntry = {
-  title: string;
+export type Experience = {
   org: string;
+  role: string;
   dates: string;
-  type: "Education" | "Work" | "Leadership";
-  bullets?: string[];
+  result: string; // one sentence, lead with the outcome
+  metric?: { value: string; label: string }; // the headline number, shown in the pixel face
+  href?: string; // e.g. "/work/sendo" to open the case study
 };
 
-export const timeline: TimelineEntry[] = [
+/** Newest first. One line each: the result, not the duties. */
+export const experience: Experience[] = [
   {
-    title: "B.A. Data Science & Cognitive Science",
-    org: "University of California, Berkeley",
-    dates: "2026 – Present",
-    type: "Education",
-  },
-  {
-    title: "Product & Software Engineering Intern",
     org: "Cal Hockey",
-    dates: "Aug 2026 – Present",
-    type: "Work",
+    role: "Product & Software Engineering Intern",
+    dates: "Aug 2026 – now",
+    result:
+      "Turned 12+ player and coach interviews into a sideline tagging workflow that cut daily film review from 2–3 hours to 20 minutes. The coaching staff now uses it at every game.",
+    metric: { value: "20 min", label: "daily film review, from 2–3 hours" },
   },
   {
-    title: "Founder & Product Lead",
-    org: "Sendo · AI form coach for climbers",
-    dates: "Feb 2026 – Present",
-    type: "Work",
+    org: "Sendo",
+    role: "Founder & Product Lead",
+    dates: "Feb 2026 – now",
+    result: "Scoped and shipped an AI form coach for climbers. 40+ beta users, 400+ climbs logged, 70% 30-day retention.",
+    metric: { value: "70%", label: "30-day retention" },
+    href: "/work/sendo",
   },
   {
-    title: "Data Science Intern, Mortgage Process Automation",
+    org: "Handshake AI",
+    role: "AI Fellow, frontier model evaluation",
+    dates: "Jul – Oct 2026",
+    result: "Ranked 152 recurring LLM failure patterns and rewrote the evaluation rubrics, raising reviewer agreement from 30% to 75%.",
+    metric: { value: "75%", label: "reviewer agreement, from 30%" },
+  },
+  {
     org: "Outamation",
+    role: "Data Science Intern, mortgage automation",
     dates: "Nov 2025 – Mar 2026",
-    type: "Work",
+    result: "Built PDF extraction pipelines that cut per-document handling from 20 to 5 minutes, saving a 15-person team 10 hours a week.",
+    metric: { value: "10 h", label: "saved a week for a 15-person team" },
+  },
+  {
+    org: "S.L.I.C.E. Athletics",
+    role: "Co-Founder & Vice President, nonprofit",
+    dates: "Nov 2022 – Aug 2025",
+    result:
+      "Co-founded a sports program for students with disabilities and grew it through partnerships with 5 schools and disability centers. Ran the budget that kept weekly programs and seasonal events going for 3 years.",
+    metric: { value: "150+", label: "students with disabilities served" },
   },
 ];
+
+export const education = {
+  school: "UC Berkeley",
+  degree: "B.A. Data Science & Cognitive Science",
+  dates: "2026 – now",
+};
 
 export type Project = {
   id: string;
   title: string;
+  context: string; // who and where, e.g. "Cal Hacks 13.0, team of 3"
   problem: string;
-  tags: string[];
   metric: { value: string; label: string }; // the headline number on the card
-  cover: string; // CSS gradient, or swap for an image path via `image`
-  image?: string;
+  image?: string; // shown dithered; hovering a card reveals the original
   problemDetail: string;
   users: string;
   role: string;
@@ -103,10 +97,9 @@ export const projects: Project[] = [
   {
     id: "sendo",
     title: "Sendo",
+    context: "Founder and product lead, 2026",
     problem: "Climbers improve slowly because almost no one gets feedback on their form.",
-    tags: ["0 → 1", "AI / Computer Vision", "A/B Testing"],
     metric: { value: "70%", label: "30-day retention across 40+ beta climbers" },
-    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
     image: "/projects/sendo.jpg",
     problemDetail:
       "Most climbers learn by trial and error. Coaching is expensive and rare, so bad habits stick. In a 100-climber survey, 80% said they had no source of feedback on their form.",
@@ -131,10 +124,10 @@ export const projects: Project[] = [
   {
     id: "forgeai",
     title: "ForgeAI",
+    context: "Cal Hacks 13.0, team of 3",
+    image: "/projects/forgeai.jpg",
     problem: "Engineers can design a part in an afternoon, then wait days to find out what it costs to make.",
-    tags: ["Hackathon", "3D / CAD", "Voice AI"],
     metric: { value: "STL → $", label: "CAD file to price, budget check and spoken invoice in one flow" },
-    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
     problemDetail:
       "One of our teammates is a mechanical engineer who kept hitting the same wall: design software knows everything about a part's geometry and nothing about its cost. Stock had to be sized by hand, machining time estimated, quotes chased, and the total checked against a budget that was already partly spent.",
     users: "Mechanical engineers and small manufacturing teams who need to know what a part will cost, and whether the budget can cover it, before they commit.",
@@ -159,10 +152,9 @@ export const projects: Project[] = [
   {
     id: "3d-gallery",
     title: "Interactive 3D Object Gallery",
+    context: "RoseHacks 2026, team of 4",
     problem: "Art is meant to be experienced, but online it's just a flat image on a screen.",
-    tags: ["Hackathon", "Hardware", "Computer Vision"],
     metric: { value: "2nd", label: "of 40 teams at RoseHacks 2026, built in 24 hours" },
-    cover: "linear-gradient(135deg, #141b3c 0%, #1c2550 60%, #2b6f7a 150%)",
     image: "/projects/3d-gallery.jpg",
     problemDetail:
       "Seeing art in person is physical: you walk around a piece and look at it from every angle. Online galleries flatten all of that into a static picture, so people who can't be there miss most of the experience.",
@@ -472,41 +464,33 @@ export const breakdowns: Breakdown[] = [
 export const contact = {
   email: "ronanwong@berkeley.edu",
   linkedin: "https://www.linkedin.com/in/ronanwong",
+  github: "https://github.com/Rxin-exe",
   resume: "/Ronan_Wong_Resume.pdf", // phone number and grad date removed
 };
 
-type SectionCopy = { index: string; label: string; title: string; intro?: string };
+type SectionCopy = { label: string; title: string; intro?: string };
 
 /** Headings for each section, in page order. The nav is built from this. */
-export const sections: Record<"about" | "timeline" | "projects" | "breakdowns" | "contact", SectionCopy> = {
-  about: {
-    index: "01",
-    label: "About",
-    title: "From CS at Mt. SAC to product at Berkeley.",
-  },
-  timeline: {
-    index: "02",
+export const sections: Record<"experience" | "projects" | "breakdowns" | "contact", SectionCopy> = {
+  experience: {
     label: "Experience",
-    title: "Education & experience",
+    title: "Experience",
   },
   projects: {
-    index: "03",
     label: "Projects",
-    title: "Three products, start to finish.",
-    intro: "From the first user interview to the numbers after launch. Each one opens as a full write-up with its own shareable link.",
+    title: "Projects",
+    intro: "Each opens as a full write-up: the problem, what I cut, and what happened after launch.",
   },
   breakdowns: {
-    index: "04",
-    label: "Breakdowns",
-    title: "Teardowns of products I use.",
-    intro: "Duolingo, Notion, Spotify and Strava: what works, where it breaks, and the one thing I'd ship next.",
+    label: "Teardowns",
+    title: "Product teardowns",
+    intro: "What works, where it breaks, and the one thing I'd ship next.",
   },
   contact: {
-    index: "05",
     label: "Contact",
-    title: "Hiring for Summer 2027?",
-    intro: "I'm looking for PM and APM internships. Email me, or grab my resume.",
+    title: "Hiring PM interns for Summer 2027?",
+    intro: "Email is the fastest way to reach me.",
   },
 };
 
-export const nav = (Object.keys(sections) as (keyof typeof sections)[]).map((id) => ({ id, label: sections[id].label }));
+export const nav = (["experience", "projects", "breakdowns"] as const).map((id) => ({ id, label: sections[id].label }));

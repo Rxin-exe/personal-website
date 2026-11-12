@@ -6,13 +6,9 @@ import { breakdowns, contact, nav, projects } from "@/content/site";
 
 type Item = { group: string; label: string; hint?: string; run: () => void };
 
-const goTo = (id: string) => {
-  history.replaceState(null, "", `#${id}`);
-  document.getElementById(id)?.scrollIntoView({ block: "start" });
-};
-const openHash = (hash: string) => {
-  window.location.hash = hash; // the section's useHashModal picks this up
-};
+// Works from any page: on the home page these only change the hash and scroll.
+const goTo = (id: string) => window.location.assign(`/#${id}`);
+const openHash = (hash: string) => window.location.assign(`/#${hash}`);
 
 /** ⌘K / Ctrl+K (or "/") jump menu: every section, project and breakdown in one list. */
 export default function CommandMenu() {
@@ -24,7 +20,7 @@ export default function CommandMenu() {
 
   const items = useMemo<Item[]>(
     () => [
-      ...projects.map((p) => ({ group: "Projects", label: p.title, hint: `${p.metric.value} ${p.metric.label}`, run: () => openHash(`project/${p.id}`) })),
+      ...projects.map((p) => ({ group: "Projects", label: p.title, hint: `${p.metric.value} ${p.metric.label}`, run: () => window.location.assign(`/work/${p.id}`) })),
       ...breakdowns.map((b) => ({ group: "Breakdowns", label: b.title, hint: b.product, run: () => openHash(`breakdown/${b.id}`) })),
       ...nav.map((n) => ({ group: "Sections", label: n.label, run: () => goTo(n.id) })),
       { group: "Links", label: "Resume (PDF)", run: () => window.open(contact.resume, "_blank", "noopener") },

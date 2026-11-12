@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
+import { Close } from "./icons";
 
 type Props = {
   labelledBy: string;
@@ -71,9 +72,7 @@ export default function Modal({ labelledBy, onClose, children }: Props) {
     >
       <div ref={dialogRef} className="modal" role="dialog" aria-modal="true" aria-labelledby={labelledBy} tabIndex={-1}>
         <button className="modal-close" onClick={onClose} aria-label="Close">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-          </svg>
+          <Close />
         </button>
         {children}
       </div>

@@ -5,23 +5,15 @@ import { contact, nav, profile } from "@/content/site";
 
 export default function Nav() {
   const [active, setActive] = useState("");
-  const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [shortcut, setShortcut] = useState("⌘K");
 
   useEffect(() => {
     const onScroll = () => {
-      setScrolled(window.scrollY > 8);
       // The active section is the last one whose top has passed ~40% of the viewport.
       const marker = window.innerHeight * 0.4;
       let current = "";
       for (const { id } of nav) {
         const el = document.getElementById(id);
         if (el && el.getBoundingClientRect().top <= marker) current = id;
-      }
-      // At the very bottom, the last section wins even if it's short.
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) {
-        current = nav[nav.length - 1].id;
       }
       setActive(current);
     };
@@ -34,66 +26,28 @@ export default function Nav() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!/Mac|iPhone|iPad/.test(navigator.platform)) setShortcut("Ctrl K");
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
-
   return (
-    <header className={`nav ${scrolled ? "is-scrolled" : ""}`}>
-      <nav className="container nav-inner" aria-label="Primary">
-        <a href="#top" className="logo" aria-label={`${profile.name}, back to top`}>
-          {profile.initials}
-        </a>
-        <button
-          type="button"
-          className="nav-jump"
-          onClick={() => window.dispatchEvent(new Event("open-command-menu"))}
-          aria-label="Jump to a section or project"
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <circle cx="11" cy="11" r="7" />
-            <path d="M20 20l-3.5-3.5" />
-          </svg>
-          <span className="nav-jump-label">Jump to</span>
-          <kbd>{shortcut}</kbd>
-        </button>
-        <button
-          className="nav-toggle"
-          aria-expanded={open}
-          aria-controls="nav-links"
-          aria-label={open ? "Close menu" : "Open menu"}
-          onClick={() => setOpen((o) => !o)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-        <ul id="nav-links" className={`nav-links ${open ? "is-open" : ""}`}>
-          {nav.map(({ id, label }) => (
-            <li key={id}>
-              <a
-                href={`#${id}`}
-                className={active === id ? "is-active" : ""}
-                aria-current={active === id ? "true" : undefined}
-                onClick={() => setOpen(false)}
-              >
-                {label}
+    <header className="nav">
+      <nav className="container" aria-label="Primary">
+        <div className="nav-panel">
+          <a href="/" className="logo" aria-label={`${profile.name}, back to top`}>
+            {profile.initials}
+          </a>
+          <ul className="nav-links">
+            {nav.map(({ id, label }) => (
+              <li key={id} className="nav-section">
+                <a href={`/#${id}`} aria-current={active === id ? "true" : undefined}>
+                  {label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={`mailto:${contact.email}`} className="btn btn-primary btn-sm">
+                Email me
               </a>
             </li>
-          ))}
-          <li>
-            <a href={contact.resume} className="nav-resume" target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
-              Resume
-            </a>
-          </li>
-        </ul>
+          </ul>
+        </div>
       </nav>
     </header>
   );
