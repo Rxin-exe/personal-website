@@ -29,7 +29,8 @@ function dissolve(img: ImageData, { top = 0, bottom = 0 }: { top?: number; botto
 export default function DitherScene({ scene, className = "" }: { scene: SceneId; className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
-  const [spots, setSpots] = useState<{ id: string; label: string; left: number; top: number; width: number; height: number }[]>([]);
+  type Spot = { id: string; label: string; tip: string; info?: boolean; tone?: string; left: number; top: number; width: number; height: number };
+  const [spots, setSpots] = useState<Spot[]>([]);
   const actRef = useRef<(id: string) => void>(() => {});
 
   useEffect(() => {
@@ -66,6 +67,11 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
       }
     };
 
+    // Day/night (Konami code): the old frame dissolves into the new one in Bayer order.
+    let lastOut: ImageData | null = null;
+    let fade: { prev: ImageData; start: number } | null = null;
+    const FADE_MS = 700;
+
     const show = () => {
       if (!base) return;
       const out = new ImageData(new Uint8ClampedArray(base.data), base.width, base.height);
@@ -86,7 +92,8 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
         }
         if (p > 0.55) finishIntro();
         if (p >= 1) intro = false;
-      } else if (bright && s.hover && hoverK > 0.01) {
+      } else if (bright && s.hover && hoverK > 0.01 && !acting) {
+        // (Paused while a click is playing out, so the brighter frame doesn't paint over it.)
         // Cursor near the sun: swap in pixels from the bright version, in Bayer order,
         // more of them the closer they are to the sun.
         const at = s.hover.at(out.width, out.height);
@@ -109,6 +116,25 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
           }
         }
       }
+      if (fade && fade.prev.width === out.width && fade.prev.height === out.height) {
+        const t = (performance.now() - fade.start) / FADE_MS;
+        if (t >= 1) fade = null;
+        else {
+          const d = out.data;
+          const p = fade.prev.data;
+          for (let y = 0; y < out.height; y++) {
+            for (let x = 0; x < out.width; x++) {
+              if (bayerAt(x, y) < t) continue;
+              const i = (y * out.width + x) * 4;
+              d[i] = p[i];
+              d[i + 1] = p[i + 1];
+              d[i + 2] = p[i + 2];
+              d[i + 3] = p[i + 3];
+            }
+          }
+        }
+      }
+      lastOut = out;
       ctx.putImageData(out, 0, 0);
     };
 
@@ -145,28 +171,76 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
       placeSpots();
     };
 
-    // Clickable spots (camp: the climber and the fire), placed over the canvas in CSS px.
+    // Things you can point at (camp: the climber, the fire, the moon), placed over the canvas in CSS px.
     function placeSpots() {
       if (!s.hotspots || !base) return;
       setSpots(
-        s.hotspots(base.width, base.height).map((h) => ({ id: h.id, label: h.label, left: h.x * CELL, top: h.y * CELL, width: h.w * CELL, height: h.h * CELL }))
+        s.hotspots(base.width, base.height).map((h) => ({
+          id: h.id,
+          label: h.label,
+          tip: h.tip,
+          info: h.info,
+          tone: h.tone,
+          left: h.x * CELL,
+          top: h.y * CELL,
+          width: h.w * CELL,
+          height: h.h * CELL,
+        }))
       );
     }
 
     // A click plays the scene's response, frame by frame, then settles.
     let actRaf = 0;
+    let acting = false;
     actRef.current = (id: string) => {
       if (!s.act) return;
       const ms = s.act(id, reduced);
       const end = performance.now() + ms + 60;
       cancelAnimationFrame(actRaf);
+      acting = ms > 0;
       const tick = () => {
         show();
         if (performance.now() < end) actRaf = requestAnimationFrame(tick);
-        else placeSpots();
+        else {
+          acting = false;
+          show();
+          placeSpots();
+        }
       };
       tick();
     };
+
+    // Repaint for day or night, dissolving from the frame that's on screen now.
+    let fadeRaf = 0;
+    const onDaylight = () => {
+      if (lastOut && !reduced) fade = { prev: lastOut, start: performance.now() };
+      lastKey = "";
+      draw();
+      cancelAnimationFrame(fadeRaf);
+      const tick = () => {
+        show();
+        if (fade) fadeRaf = requestAnimationFrame(tick);
+      };
+      if (fade) fadeRaf = requestAnimationFrame(tick);
+    };
+    window.addEventListener("daylight", onDaylight);
+    // A repaint for just this scene (setting the sun).
+    const onRedraw = (e: Event) => (e as CustomEvent<string>).detail === scene && onDaylight();
+    window.addEventListener("scene-redraw", onRedraw);
+    // An action played from outside (typing "send").
+    const onAct = (e: Event) => {
+      const d = (e as CustomEvent<{ scene: string; id: string }>).detail;
+      if (d?.scene === scene) actRef.current(d.id);
+    };
+    window.addEventListener("scene-act", onAct);
+    // Secret clicks on the scene itself (the sun), mapped to cells.
+    const onClick = (e: MouseEvent) => {
+      if (!s.onSceneClick || !base) return;
+      const r = canvas.getBoundingClientRect();
+      if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
+      s.onSceneClick((e.clientX - r.left) / CELL, (e.clientY - r.top) / CELL, base.width, base.height);
+    };
+    if (s.onSceneClick) window.addEventListener("click", onClick);
 
     draw();
     if (intro) runIntro();
@@ -203,6 +277,7 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
 
     // Flicker: a few frames a second, only while visible.
     let timer: ReturnType<typeof setInterval> | undefined;
+    let liveWas = false;
     let io: IntersectionObserver | undefined;
     if (s.frames && s.frames > 1 && !reduced) {
       io = new IntersectionObserver(([e]) => {
@@ -211,6 +286,9 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
           timer = setInterval(() => {
             frame = (frame + 1) % s.frames!;
             show();
+            // Moving hotspots (the bear) keep their buttons in step.
+            if (s.live?.() || liveWas) placeSpots();
+            liveWas = !!s.live?.();
           }, 220);
       });
       io.observe(canvas);
@@ -220,6 +298,11 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
       ro.disconnect();
       io?.disconnect();
       cancelAnimationFrame(actRaf);
+      cancelAnimationFrame(fadeRaf);
+      window.removeEventListener("daylight", onDaylight);
+      window.removeEventListener("scene-redraw", onRedraw);
+      window.removeEventListener("scene-act", onAct);
+      window.removeEventListener("click", onClick);
       clearInterval(timer);
       cancelAnimationFrame(raf);
       // Don't end the entrance here: React may remount and replay it. The head script's
@@ -237,17 +320,24 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
   return (
     <div className={`scene-wrap ${className}`}>
       {canvas}
-      {spots.map((p) => (
-        <button
-          key={p.id}
-          type="button"
-          className="scene-spot"
-          style={{ left: p.left, top: p.top, width: p.width, height: p.height }}
-          aria-label={p.label}
-          title={p.label}
-          onClick={() => actRef.current(p.id)}
-        />
-      ))}
+      {spots.map((p) => {
+        const style = { left: p.left, top: p.top, width: p.width, height: p.height };
+        const tip = (
+          <span className="scene-tip" aria-hidden="true">
+            <span className="scene-tip-bubble">{p.tip}</span>
+          </span>
+        );
+        // Info spots only explain (hover for the tip); the rest are buttons that do something.
+        return p.info ? (
+          <span key={p.id} className={`scene-spot is-info tone-${p.tone ?? "moon"}`} style={style} title={p.label}>
+            {tip}
+          </span>
+        ) : (
+          <button key={p.id} type="button" className={`scene-spot tone-${p.tone ?? "fire"}`} style={style} aria-label={p.label} onClick={() => actRef.current(p.id)}>
+            {tip}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -2,15 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { contact, sections } from "@/content/site";
-import { moonPhase } from "@/lib/scenes";
 import DitherScene from "./DitherScene";
 import { ArrowUpRight, Check, Copy } from "./icons";
 
 export default function Contact() {
   const [copied, setCopied] = useState(false);
-  // Tonight's moon phase, worked out in the visitor's browser (it changes daily).
-  const [moon, setMoon] = useState<string | null>(null);
-  useEffect(() => setMoon(moonPhase().name), []);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -35,9 +31,6 @@ export default function Contact() {
   return (
     <section id="contact" className="contact-wrap" aria-labelledby="contact-title">
       <DitherScene scene="camp" className="contact-scene" />
-      <p className="scene-caption">
-        Burden of Dreams, V17, Lappnor, Finland.{moon && ` The moon is tonight's real one: ${moon}.`} Click the climber, or the fire.
-      </p>
       <div className="container contact">
         <h2 id="contact-title" className="section-title">
           {sections.contact.title}

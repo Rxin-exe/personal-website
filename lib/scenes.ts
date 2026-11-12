@@ -6,6 +6,7 @@
  *   camp   – the bottom of the page: the same climber at camp, after dark
  */
 
+import { daylight, redrawScene, summitSky } from "./daylight";
 import { PALETTE, paintClimber, paintHorizon, skyWindows, sunAt } from "./dither";
 
 type RGB = [number, number, number];
@@ -121,8 +122,13 @@ function inside(poly: [number, number][], x: number, y: number) {
 function paintCamp(data: Buf, width: number, height: number) {
   const L = campLayout(width, height);
   const moon = moonPhase();
+  const day = daylight.on;
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
+      if (day) {
+        set(data, width, x, y, campByDay(L, x, y, height));
+        continue;
+      }
       // Sky: the page's night colour at the top, a moonlit navy toward the horizon.
       let c = mix(C.night, C.navy, Math.pow(y / height, 2) * 1.1);
       // Moon and its halo.
@@ -170,6 +176,30 @@ function paintCamp(data: Buf, width: number, height: number) {
       set(data, width, x, y, c);
     }
   }
+}
+
+/** The camp in daylight (Konami code): blue sky, the sun where the moon was, pale granite. */
+function campByDay(L: ReturnType<typeof campLayout>, x: number, y: number, height: number): RGB {
+  const fd = Math.hypot((x - L.fireX) / height, (y - L.fireY) / height);
+  let c = mix(C.periwinkle, C.mist, Math.min(1, (y / height) * 1.5));
+  const sd = Math.hypot(x - L.moon.x, y - L.moon.y) / (L.moon.r * 1.2);
+  if (sd < 1) c = mix(C.peach, C.cream, 1 - sd);
+  else c = mix(c, C.cream, Math.exp(-(sd - 1) / 1.5) * 0.5);
+  if (y >= L.farRidge(x)) c = mix(mix(C.blue, C.periwinkle, 0.4), C.navy, Math.min(1, (y - L.farRidge(x)) / (height * 0.2)));
+  if (y >= L.groundY(x)) {
+    c = mix(C.slate, C.navy, Math.min(1, (y - L.groundY(x)) / (height * 0.2)));
+    c = mix(c, C.orange, Math.exp(-fd / 0.04) * 0.4);
+  }
+  if (inside(L.boulder, x + 0.5, y + 0.5)) {
+    const grain = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+    const speck = grain - Math.floor(grain);
+    c = mix(C.slate, C.mist, 0.3);
+    if (speck > 0.9) c = mix(c, C.cream, 0.4);
+    if (!inside(L.boulder, x + 0.5, y - 2.5 * L.k)) c = mix(c, C.cream, 0.5);
+    // The overhanging face is in its own shade.
+    if ((x - L.face.x) - (y - L.face.y) < 6 * L.k) c = mix(c, C.navy, 0.45);
+  }
+  return c;
 }
 
 const TENT = [
@@ -317,7 +347,55 @@ const CHEER_HD = rim([
 const CHEER = halve(CHEER_HD);
 
 /** What's happening at camp: set by clicks, read when drawing. Lives for this page visit. */
-const camp = { sendAt: 0, sent: false, sparkAt: 0 };
+const camp = { sendAt: 0, sent: false, sparkAt: 0, tentOff: false, bearAt: 0, nextBear: 0, hopAt: 0 };
+
+// The Cal bear: a golden bear that wanders through camp now and then, lit by the fire.
+const BEAR_MS = 11000;
+const BEAR = [
+  [
+    "..........#...",
+    ".........###..",
+    "..########.###",
+    ".#############",
+    "##############",
+    "#############.",
+    ".##.##...##.##",
+    ".##.##...##.##",
+  ],
+  [
+    "..........#...",
+    ".........###..",
+    "..########.###",
+    ".#############",
+    "##############",
+    "#############.",
+    ".##..##.##..##",
+    "##...##.##...##",
+  ].map((r) => r.slice(0, 14)),
+];
+
+/** Where the bear is now (cells), or null if it isn't out. Starts its walk when it's time. */
+function bearNow(L: ReturnType<typeof campLayout>, width: number, now: number) {
+  if (!camp.nextBear) camp.nextBear = now + 4000 + Math.random() * 6000;
+  // Only head out while the camp is on screen, so nobody misses it.
+  if (!camp.bearAt && now >= camp.nextBear) {
+    const r = typeof document !== "undefined" ? document.getElementById("contact")?.getBoundingClientRect() : undefined;
+    if (r && r.top < window.innerHeight * 0.6 && r.bottom > 0) camp.bearAt = now;
+    else camp.nextBear = now + 3000;
+  }
+  if (!camp.bearAt) return null;
+  const t = (now - camp.bearAt) / BEAR_MS;
+  if (t >= 1) {
+    camp.bearAt = 0;
+    camp.nextBear = now + 40000 + Math.random() * 30000;
+    return null;
+  }
+  const S = L.S;
+  const x = Math.round(-16 * S + t * (width + 32 * S));
+  const hop = camp.hopAt && now - camp.hopAt < 400 ? Math.round(Math.sin(((now - camp.hopAt) / 400) * Math.PI) * 4 * S) : 0;
+  const y = Math.round(L.groundY(x + 7 * S)) + S - BEAR[0].length * S - hop;
+  return { x, y, w: 14 * S, h: 8 * S, frame: Math.floor((now - camp.bearAt) / 260) % 2 };
+}
 const SEND_MS = 2600;
 const SPARK_MS = 1400;
 
@@ -347,7 +425,9 @@ function campSprites(data: Buf, width: number, height: number, frame: number, fa
   }
   const tentBase = Math.round(L.groundY(L.tentX));
   const S = L.S;
-  sprite(data, width, height, TENT, L.tentX - 7 * S, tentBase - TENT.length * S, { "#": C.blue, o: C.rust, p: C.peach }, S);
+  // Clicking the tent switches its light off (and back on).
+  const tentGlow = camp.tentOff ? { o: C.navy, p: C.night } : { o: C.rust, p: C.peach };
+  sprite(data, width, height, TENT, L.tentX - 7 * S, tentBase - TENT.length * S, { "#": C.blue, ...tentGlow }, S);
   const now = performance.now();
   // Send progress: 0 before, 0–1 during, 1 after.
   const send = camp.sent ? 1 : camp.sendAt ? Math.min(1, (now - camp.sendAt) / SEND_MS) : 0;
@@ -400,6 +480,10 @@ function campSprites(data: Buf, width: number, height: number, frame: number, fa
     sprite(data, width, height, body, padX + 3 * S, padY - 2 * S - body.length, { "#": C.rust, o: C.orange, h: C.peach });
     return;
   }
+  // The bear, if it's out for a walk.
+  const bear = fallen ? null : bearNow(L, width, now);
+  if (bear) sprite(data, width, height, rim(BEAR[bear.frame]), bear.x, bear.y, { "#": C.orange, o: C.peach }, S);
+
   const lit = { "#": C.rust, o: C.orange, h: C.peach };
   const top = summitSpot(L);
   if (send >= 1) {
@@ -430,22 +514,53 @@ function summitSpot(L: ReturnType<typeof campLayout>) {
   };
 }
 
-type Hotspot = { id: string; label: string; x: number; y: number; w: number; h: number };
+/**
+ * Something in a scene you can point at. `tip` shows on hover or focus. `info` spots
+ * just explain (the moon); the rest do something when clicked.
+ */
+type Hotspot = { id: string; label: string; tip: string; x: number; y: number; w: number; h: number; info?: boolean; tone?: Tone };
+
+/** Colours the hint bubble after the light it's in: the campfire or the moon. */
+type Tone = "fire" | "moon";
+
 
 /** Clickable areas in the camp, in cells: the climber (send it) and the fire (stoke it). */
 function campHotspots(width: number, height: number, fallen: boolean): Hotspot[] {
   const L = campLayout(width, height);
   const S = L.S;
   const spots: Hotspot[] = [
-    { id: "fire", label: "Stoke the fire", x: L.fireX - 6 * S, y: L.fireY - 12 * S, w: 12 * S, h: 13 * S },
+    { id: "fire", label: "Stoke the fire", tip: "Stoke the fire", tone: "fire", x: L.fireX - 6 * S, y: L.fireY - 12 * S, w: 12 * S, h: 13 * S },
+    {
+      id: "tent",
+      label: camp.tentOff ? "Turn the tent light on" : "Turn the tent light off",
+      tip: camp.tentOff ? "Lights on" : "Lights out",
+      tone: "fire",
+      x: L.tentX - 8 * S,
+      y: Math.round(L.groundY(L.tentX)) - 9 * S,
+      w: 16 * S,
+      h: 9 * S,
+    },
+    {
+      id: "moon",
+      label: `Tonight's moon: ${moonPhase().name}`,
+      tip: `Tonight's real moon: ${moonPhase().name}`,
+      info: true,
+      tone: "moon",
+      x: L.moon.x - L.moon.r,
+      y: L.moon.y - L.moon.r,
+      w: L.moon.r * 2,
+      h: L.moon.r * 2,
+    },
   ];
+  const bear = fallen ? null : bearNow(L, width, performance.now());
+  if (bear) spots.push({ id: "bear", label: "Go Bears", tip: "Go Bears.", tone: "fire", x: bear.x - 2, y: bear.y - 3, w: bear.w + 4, h: bear.h + 3 });
   if (!fallen) {
     if (camp.sent) {
       const t = summitSpot(L);
-      spots.push({ id: "send", label: "They sent it", x: t.sitX - 2 * S, y: t.sitY - 8 * S, w: 10 * S, h: 9 * S });
+      spots.push({ id: "send", label: "They sent it", tip: "Sent. On to the next project.", tone: "fire", x: t.sitX - 2 * S, y: t.sitY - 8 * S, w: 10 * S, h: 9 * S });
     } else {
       const reach = Math.round(L.face.length * 0.75);
-      spots.push({ id: "send", label: "Send Burden of Dreams", x: L.face.x - reach - 2 * S, y: L.face.y - reach - S, w: 14 * S, h: 13 * S });
+      spots.push({ id: "send", label: "Send Burden of Dreams", tip: "Click to send", tone: "fire", x: L.face.x - reach - 2 * S, y: L.face.y - reach - S, w: 14 * S, h: 13 * S });
     }
   }
   return spots;
@@ -454,6 +569,14 @@ function campHotspots(width: number, height: number, fallen: boolean): Hotspot[]
 /** Handles a click on a hotspot. Returns how long (ms) the scene should animate. */
 function campAct(id: string, instant: boolean) {
   const now = performance.now();
+  if (id === "bear") {
+    camp.hopAt = instant ? 0 : performance.now();
+    return instant ? 0 : 450;
+  }
+  if (id === "tent") {
+    camp.tentOff = !camp.tentOff;
+    return 0;
+  }
   if (id === "fire") {
     camp.sparkAt = instant ? 0 : now;
     return instant ? 0 : SPARK_MS;
@@ -467,6 +590,31 @@ function campAct(id: string, instant: boolean) {
     return SEND_MS;
   }
   return 0;
+}
+
+// ---------- summit: setting the sun ----------
+
+/** Five clicks on the sun, each within 2s of the last, and it sets for a few seconds. */
+const sunClicks = { count: 0, last: 0, busy: false };
+
+function summitClick(x: number, y: number, width: number, height: number) {
+  const s = sunAt(width, height);
+  if (Math.hypot(x - s.x, y - s.y) > Math.max(10, width * 0.05)) return;
+  const now = performance.now();
+  sunClicks.count = now - sunClicks.last < 2000 ? sunClicks.count + 1 : 1;
+  sunClicks.last = now;
+  if (sunClicks.count < 5 || sunClicks.busy || daylight.on) return;
+  sunClicks.count = 0;
+  sunClicks.busy = true;
+  const step = (mode: typeof summitSky.mode, after: number) =>
+    setTimeout(() => {
+      summitSky.mode = mode;
+      redrawScene("summit");
+    }, after);
+  step("dusk", 0);
+  step("night", 1100);
+  step("sunset", 7000);
+  setTimeout(() => (sunClicks.busy = false), 7800);
 }
 
 // ---------- rule: the horizon line under each section title ----------
@@ -501,6 +649,10 @@ type Scene = {
   origin?: (w: number, h: number) => { x: number; y: number };
   /** Clickable areas (in cells), each a real button over the canvas. */
   hotspots?: (w: number, h: number) => Hotspot[];
+  /** Responds to a click anywhere on the scene (cells); for secrets with no visible button. */
+  onSceneClick?: (x: number, y: number, w: number, h: number) => void;
+  /** True while hotspots are moving (e.g. the bear walking), so their buttons follow. */
+  live?: () => boolean;
   /** Responds to a hotspot click; returns how long the scene should animate (ms). */
   act?: (id: string, instant: boolean) => number;
   /** A brighter version the scene blends toward, around `at`, as the cursor approaches it. */
@@ -517,6 +669,7 @@ export const scenes: Record<SceneId, Scene> = {
     spread: 48,
     dissolve: { bottom: 0.2 },
     origin: sunAt,
+    onSceneClick: summitClick,
     hover: {
       paint: (d, w, h) => paintHorizon(d, w, h, 1),
       post: (d, w, h) => {
@@ -533,6 +686,7 @@ export const scenes: Record<SceneId, Scene> = {
     spread: 44,
     dissolve: { top: 0.3 },
     hotspots: (w, h) => campHotspots(w, h, false),
+    live: () => camp.bearAt > 0,
     act: campAct,
   },
   fallen: {

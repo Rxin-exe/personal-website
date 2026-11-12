@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { actOnScene, daylight, setDaylight } from "@/lib/daylight";
 import { coverWipe, revealWipe } from "@/lib/wipe";
 import { breakdowns, experience, projects } from "@/content/site";
 import Modal from "./Modal";
@@ -9,7 +10,7 @@ import Modal from "./Modal";
 const WORD = "beta";
 
 /**
- * Easter egg: type "beta" anywhere (climber slang for advice on a route) to see
+ * Easter eggs: the Konami code turns night to day for a moment, and typing "beta" anywhere (climber slang for advice on a route) to see
  * everything on the site as a grade pyramid. All counts come from content/site.ts.
  */
 export default function BetaEgg() {
@@ -22,6 +23,27 @@ export default function BetaEgg() {
     setOpen(true);
     requestAnimationFrame(() => revealWipe());
   };
+
+  // The Konami code (↑↑↓↓←→←→BA): the night turns to day for a few seconds.
+  useEffect(() => {
+    const CODE = ["ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", "b", "a"];
+    let at = 0;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const onKey = (e: KeyboardEvent) => {
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+      at = key === CODE[at] ? at + 1 : key === CODE[0] ? 1 : 0;
+      if (at < CODE.length) return;
+      at = 0;
+      if (daylight.on) return;
+      setDaylight(true);
+      timer = setTimeout(() => setDaylight(false), 7000);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      clearTimeout(timer);
+    };
+  }, []);
 
   // The shooting star (or anything else) can open it.
   useEffect(() => {
@@ -36,13 +58,22 @@ export default function BetaEgg() {
   useEffect(() => {
     let typed = "";
     const onKey = (e: KeyboardEvent) => {
-      const t = e.target as HTMLElement | null;
-      if (e.metaKey || e.ctrlKey || e.altKey || t?.closest("input, textarea, [contenteditable]")) return;
+      // The target may be the window or document (not an element), so check before using closest().
+      const t = e.target;
+      const typing = t instanceof Element && t.closest("input, textarea, [contenteditable]");
+      if (e.metaKey || e.ctrlKey || e.altKey || typing) return;
       if (e.key.length !== 1) return;
-      typed = (typed + e.key.toLowerCase()).slice(-WORD.length);
-      if (typed === WORD) {
+      typed = (typed + e.key.toLowerCase()).slice(-8);
+      if (typed.endsWith(WORD)) {
         typed = "";
         reveal();
+      } else if (typed.endsWith("send")) {
+        // Type "send": scroll down to camp and watch the climber send Burden of Dreams.
+        typed = "";
+        const camp = document.getElementById("contact");
+        if (!camp) return;
+        camp.scrollIntoView({ behavior: "smooth", block: "end" });
+        setTimeout(() => actOnScene("camp", "send"), 900);
       }
     };
     window.addEventListener("keydown", onKey);

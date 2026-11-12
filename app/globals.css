@@ -465,6 +465,7 @@ kbd {
 
 /* One starfield for the whole page: scrolls with it, shows through the scenes' dark skies. */
 .starfield {
+  transition: opacity 0.8s ease;
   position: absolute;
   top: 0;
   left: 0;
@@ -1119,6 +1120,19 @@ kbd {
   height: 100%;
 }
 
+/* Konami code: daytime. Stars fade, the page lifts to a daytime navy, scenes repaint. */
+html.daytime .starfield {
+  opacity: 0;
+}
+
+body {
+  transition: background-color 0.8s ease;
+}
+
+html.daytime body {
+  background: #1b2658;
+}
+
 /* Interactive scenes: the canvas fills its wrapper; buttons sit over what you can click. */
 .scene-wrap > canvas {
   display: block;
@@ -1132,6 +1146,116 @@ kbd {
   border: 0;
   background: none;
   cursor: pointer;
+}
+
+/* A pixel thought bubble over the thing you're pointing at, on hover or keyboard focus:
+   a cream bubble with stepped corners, and two pixel "thought" squares trailing down to it.
+   The outline is a set of hard drop-shadows on the wrapper, so it follows the stepped shape. */
+.scene-tip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 22px);
+  filter: drop-shadow(2px 0 0 var(--bg)) drop-shadow(-2px 0 0 var(--bg)) drop-shadow(0 2px 0 var(--bg)) drop-shadow(0 -2px 0 var(--bg));
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s ease, transform 0.15s steps(2, end);
+}
+
+/* Bubble colours: --tip-a is the main fill, --tip-b the colour its dithered lower edge
+   blends into. Registered so they can animate (a flicker for fire, a shimmer for the moon). */
+@property --tip-a {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #f2ede4;
+}
+
+@property --tip-b {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #aeb9e0;
+}
+
+/* The campfire: orange and peach, flickering in hard steps like the flames. */
+.tone-fire {
+  --tip-a: #ff8b3d;
+  --tip-b: #a8402c;
+  animation: tip-fire 0.9s steps(2, end) infinite;
+}
+
+/* The moon: pale mist with a slow shimmer toward cream. */
+.tone-moon {
+  --tip-a: #aeb9e0;
+  --tip-b: #6478b8;
+  animation: tip-moon 3s steps(4, end) infinite alternate;
+}
+
+@keyframes tip-fire {
+  50% {
+    --tip-a: #ffc38f;
+    --tip-b: #ff8b3d;
+  }
+}
+
+@keyframes tip-moon {
+  to {
+    --tip-a: #f2ede4;
+    --tip-b: #aeb9e0;
+  }
+}
+
+/* Konami daytime: every bubble turns to sky. */
+html.daytime .scene-spot {
+  --tip-a: #f2ede4;
+  --tip-b: #6478b8;
+  animation: none;
+}
+
+.scene-tip-bubble {
+  display: block;
+  padding: 6px 12px;
+  /* Solid on top; the lower edge dithers into the second colour, like the scenes. */
+  background:
+    linear-gradient(var(--tip-a), var(--tip-a)) top / 100% 55% no-repeat,
+    repeating-conic-gradient(var(--tip-a) 0 25%, var(--tip-b) 0 50%) 0 0 / 4px 4px;
+  --px: 4px;
+  clip-path: var(--pixel-corners);
+  color: var(--bg);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* The thought trail: a bigger square, then a smaller one, stepping down toward the target. */
+.scene-tip::before,
+.scene-tip::after {
+  content: "";
+  position: absolute;
+  background: var(--tip-a);
+}
+
+.scene-tip::before {
+  left: calc(50% - 10px);
+  bottom: -10px;
+  width: 7px;
+  height: 7px;
+}
+
+.scene-tip::after {
+  left: calc(50% - 4px);
+  bottom: -19px;
+  width: 4px;
+  height: 4px;
+}
+
+.scene-spot:hover .scene-tip,
+.scene-spot:focus-visible .scene-tip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.scene-spot.is-info {
+  cursor: help;
 }
 
 .scene-spot:focus-visible {
@@ -1161,22 +1285,6 @@ kbd {
 
 .lost h1.section-title {
   font-size: clamp(36px, 6vw, 64px);
-}
-
-/* Names the problem in the scene, for anyone who climbs. */
-.scene-caption {
-  position: absolute;
-  /* Lines up with the right edge of the content column. */
-  right: max(var(--gutter), calc((100% - var(--max)) / 2));
-  bottom: var(--s-4);
-  left: var(--gutter);
-  max-width: 64ch;
-  margin-left: auto;
-  font-weight: 400;
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: right;
-  color: var(--muted);
 }
 
 .contact {
@@ -1971,5 +2079,229 @@ kbd {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------- Print ----------
+   Printing the page (or saving it as a PDF) gives a clean one-colour summary: no scenes,
+   stars, animation or buttons; just who you are, experience, projects and how to reach you. */
+
+@media print {
+  @page {
+    margin: 16mm 18mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    font-size: 10.5pt;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    text-shadow: none !important;
+  }
+
+  .nav,
+  .starfield,
+  .scene,
+  .scene-wrap,
+  .section-rule,
+  .shooting-star,
+  .shooting-star-catch,
+  .wipe,
+  .skip-link,
+  .hero-actions,
+  .status-dot,
+  .card-media,
+  .card-cta,
+  .teardown-cta,
+  .pixel-logo,
+  .contact-email .btn-icon,
+  .footer-hint,
+  .hero::before,
+  .hero::after {
+    display: none !important;
+  }
+
+  /* The entrance may have hidden the hero copy; in print it's always there. */
+  .hero-copy > *,
+  .hero-name span {
+    opacity: 1 !important;
+  }
+
+  .container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .hero {
+    display: block;
+    min-height: 0;
+    padding: 0 0 10pt;
+  }
+
+  .hero-name {
+    margin: 0;
+    font-size: 26pt;
+  }
+
+  .hero-status,
+  .hero-bio {
+    max-width: none;
+    margin-top: 4pt;
+    font-size: 11pt;
+  }
+
+  h1,
+  h2,
+  h3,
+  strong,
+  .metric-value,
+  .role-who h3,
+  .teardown-title,
+  .teardown-product {
+    color: #111 !important;
+  }
+
+  p,
+  li,
+  span,
+  a {
+    color: #333 !important;
+  }
+
+  .metric-value {
+    color: #b4501d !important;
+  }
+
+  .section {
+    padding-top: 14pt;
+  }
+
+  .section-head {
+    margin-bottom: 6pt;
+  }
+
+  .section-title {
+    font-size: 15pt;
+  }
+
+  /* Panels and cards become plain blocks with a hairline. */
+  .roles-frame,
+  .projects > li,
+  .teardowns > li {
+    transform: none !important;
+  }
+
+  .roles,
+  .card,
+  .teardown {
+    padding: 6pt 0;
+    background: none !important;
+    clip-path: none !important;
+  }
+
+  .role {
+    grid-template-columns: 11rem minmax(0, 1fr) 7rem;
+    gap: 2pt 10pt;
+    padding: 6pt 0;
+    break-inside: avoid;
+  }
+
+  .role + .role {
+    border-top: 0.5pt solid #ccc;
+  }
+
+  .role-metric .metric-value {
+    font-size: 13pt;
+  }
+
+  .projects,
+  .teardowns {
+    display: block;
+  }
+
+  .projects > li,
+  .teardowns > li {
+    margin-bottom: 8pt;
+    padding-bottom: 6pt;
+    border-bottom: 0.5pt solid #ccc;
+    break-inside: avoid;
+  }
+
+  .card,
+  .card-featured {
+    flex-direction: column;
+  }
+
+  .card-body,
+  .card-featured .card-body {
+    padding: 0;
+  }
+
+  .card h3,
+  .card-featured h3 {
+    font-size: 13pt;
+  }
+
+  .card-featured .metric-value {
+    font-size: 13pt;
+  }
+
+  .metric {
+    margin-top: 4pt;
+    padding-top: 0;
+    border: 0;
+  }
+
+  /* On paper, links need their address. */
+  a.card[href^="/work"]::after {
+    content: "ronanwong.com" attr(href);
+    display: block;
+    margin-top: 2pt;
+    font-size: 9pt;
+    color: #666;
+  }
+
+  .teardown {
+    display: block;
+  }
+
+  .teardown-title {
+    margin-top: 0;
+    font-size: 11pt;
+  }
+
+  .contact-wrap {
+    margin-top: 14pt;
+  }
+
+  .contact {
+    min-height: 0;
+    padding: 0;
+  }
+
+  .contact .section-title {
+    font-size: 15pt;
+  }
+
+  .contact-email .btn-primary {
+    height: auto;
+    padding: 0;
+    background: none !important;
+    color: #111 !important;
+    font-size: 12pt;
+  }
+
+  .footer {
+    padding: 10pt 0 0;
+    border-top: 0.5pt solid #ccc;
   }
 }

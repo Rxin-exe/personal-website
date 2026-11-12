@@ -3,6 +3,7 @@ import { Geist, Geist_Pixel } from "next/font/google";
 import { profile, site } from "@/content/site";
 import BetaEgg from "@/components/BetaEgg";
 import CommandMenu from "@/components/CommandMenu";
+import ConsoleHello from "@/components/ConsoleHello";
 import ShootingStar from "@/components/ShootingStar";
 import Starfield from "@/components/Starfield";
 import { WipeReveal } from "@/components/WipeLink";
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BetaEgg />
         <ShootingStar />
         <WipeReveal />
+        <ConsoleHello />
       </body>
     </html>
   );
