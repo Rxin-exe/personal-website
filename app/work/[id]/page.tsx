@@ -5,6 +5,7 @@ import CopyLink from "@/components/CopyLink";
 import DitherImage from "@/components/DitherImage";
 import Footer from "@/components/Footer";
 import Nav from "@/components/Nav";
+import PixelChart from "@/components/PixelChart";
 import WipeLink from "@/components/WipeLink";
 import { ArrowUpRight } from "@/components/icons";
 
@@ -55,11 +56,20 @@ export default async function CaseStudy({ params }: Params) {
     {
       title: "Results",
       content: (
-        <ul>
-          {p.results.map((r) => (
-            <li key={r}>{r}</li>
-          ))}
-        </ul>
+        <>
+          {p.charts && (
+            <div className="case-charts">
+              {p.charts.map((c) => (
+                <PixelChart key={c.title} chart={c} />
+              ))}
+            </div>
+          )}
+          <ul>
+            {p.results.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </>
       ),
     },
     ...(p.next ? [{ title: "What I'd do next", content: <p>{p.next}</p> }] : []),

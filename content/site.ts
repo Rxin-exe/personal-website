@@ -91,7 +91,13 @@ export type Project = {
   results: string[];
   next?: string;
   links?: { label: string; href: string }[];
+  /** Results drawn as pixel charts on the case study page. Real numbers only. */
+  charts?: Chart[];
 };
+
+export type Chart =
+  | { kind: "bars"; title: string; unit: string; bars: { label: string; value: number; highlight?: boolean }[] }
+  | { kind: "squares"; title: string; total: number; lit: number[]; caption: string };
 
 export const projects: Project[] = [
   {
@@ -120,6 +126,24 @@ export const projects: Project[] = [
     ],
     next: "Reach beyond active climbers: make Sendo the way people who have never touched the sport take their first climbs, with form guidance from day one.",
     links: [{ label: "Live app", href: "https://sendo-five.vercel.app/" }],
+    charts: [
+      {
+        kind: "bars",
+        title: "A/B test: weekly climbs logged",
+        unit: "climbs a week",
+        bars: [
+          { label: "Raw metrics", value: 30 },
+          { label: "Per-move body cues", value: 70, highlight: true },
+        ],
+      },
+      {
+        kind: "squares",
+        title: "In-app ratings",
+        total: 20,
+        lit: Array.from({ length: 19 }, (_, i) => i),
+        caption: "19 of 20 positive",
+      },
+    ],
   },
   {
     id: "forgeai",
@@ -170,6 +194,15 @@ export const projects: Project[] = [
     results: ["Placed 2nd of 40 teams at RoseHacks 2026", "Shipped a working hardware + software demo in 24 hours"],
     next: "Put it in front of real artists and viewers: test whether hand tracking alone feels natural enough to drop the remote, and add the next interaction people ask for most, such as zoom.",
     links: [{ label: "Devpost", href: "https://devpost.com/software/interactive-3d-object-gallery" }],
+    charts: [
+      {
+        kind: "squares",
+        title: "RoseHacks 2026 placing",
+        total: 40,
+        lit: [1],
+        caption: "2nd of 40 teams",
+      },
+    ],
   },
 ];
 

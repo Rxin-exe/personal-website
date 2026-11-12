@@ -29,6 +29,8 @@ function dissolve(img: ImageData, { top = 0, bottom = 0 }: { top?: number; botto
 export default function DitherScene({ scene, className = "" }: { scene: SceneId; className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
+  const [spots, setSpots] = useState<{ id: string; label: string; left: number; top: number; width: number; height: number }[]>([]);
+  const actRef = useRef<(id: string) => void>(() => {});
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -140,6 +142,30 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
       }
       show();
       setReady(true);
+      placeSpots();
+    };
+
+    // Clickable spots (camp: the climber and the fire), placed over the canvas in CSS px.
+    function placeSpots() {
+      if (!s.hotspots || !base) return;
+      setSpots(
+        s.hotspots(base.width, base.height).map((h) => ({ id: h.id, label: h.label, left: h.x * CELL, top: h.y * CELL, width: h.w * CELL, height: h.h * CELL }))
+      );
+    }
+
+    // A click plays the scene's response, frame by frame, then settles.
+    let actRaf = 0;
+    actRef.current = (id: string) => {
+      if (!s.act) return;
+      const ms = s.act(id, reduced);
+      const end = performance.now() + ms + 60;
+      cancelAnimationFrame(actRaf);
+      const tick = () => {
+        show();
+        if (performance.now() < end) actRaf = requestAnimationFrame(tick);
+        else placeSpots();
+      };
+      tick();
     };
 
     draw();
@@ -193,6 +219,7 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
     return () => {
       ro.disconnect();
       io?.disconnect();
+      cancelAnimationFrame(actRaf);
       clearInterval(timer);
       cancelAnimationFrame(raf);
       // Don't end the entrance here: React may remount and replay it. The head script's
@@ -203,5 +230,24 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
     };
   }, [scene]);
 
-  return <canvas ref={canvasRef} className={`scene scene--${scene} ${ready ? "is-ready" : ""} ${className}`} aria-hidden="true" />;
+  const interactive = !!scenes[scene].hotspots;
+  const canvas = <canvas ref={canvasRef} className={`scene scene--${scene} ${ready ? "is-ready" : ""} ${interactive ? "" : className}`} aria-hidden="true" />;
+  if (!interactive) return canvas;
+  // Interactive scenes: the canvas plus real buttons over the things you can click.
+  return (
+    <div className={`scene-wrap ${className}`}>
+      {canvas}
+      {spots.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          className="scene-spot"
+          style={{ left: p.left, top: p.top, width: p.width, height: p.height }}
+          aria-label={p.label}
+          title={p.label}
+          onClick={() => actRef.current(p.id)}
+        />
+      ))}
+    </div>
+  );
 }

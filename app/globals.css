@@ -625,6 +625,11 @@ kbd {
    One panel, one row per role, the same three columns all the way down:
    who and when | what happened | the number. */
 
+/* The same sunset-lit 3D edge as the project cards, following the stepped corners. */
+.roles-frame {
+  filter: drop-shadow(var(--slab) var(--slab) 0 var(--slab-card));
+}
+
 .roles {
   margin: 0;
   padding: var(--s-2) var(--s-6);
@@ -1114,6 +1119,36 @@ kbd {
   height: 100%;
 }
 
+/* Interactive scenes: the canvas fills its wrapper; buttons sit over what you can click. */
+.scene-wrap > canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene-spot {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.scene-spot:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0;
+}
+
+/* Let clicks through the copy's empty space to the scene behind it. */
+.contact-wrap .contact {
+  pointer-events: none;
+}
+
+.contact-wrap .contact > * {
+  pointer-events: auto;
+}
+
 /* 404: the camp scene fills the page; push the copy below the nav. */
 .lost {
   margin-top: 0;
@@ -1134,8 +1169,13 @@ kbd {
   /* Lines up with the right edge of the content column. */
   right: max(var(--gutter), calc((100% - var(--max)) / 2));
   bottom: var(--s-4);
+  left: var(--gutter);
+  max-width: 64ch;
+  margin-left: auto;
   font-weight: 400;
   font-size: 13px;
+  line-height: 1.5;
+  text-align: right;
   color: var(--muted);
 }
 
@@ -1732,6 +1772,129 @@ kbd {
 
 .case-body .prose-section + .prose-section {
   margin-top: var(--s-7);
+}
+
+/* ---------- Pixel charts (case study results) ---------- */
+
+.case-charts {
+  display: grid;
+  gap: var(--s-4);
+  margin-bottom: var(--s-5);
+}
+
+.pchart {
+  margin: 0;
+  padding: var(--s-5);
+  background: var(--surface);
+  clip-path: var(--pixel-corners);
+}
+
+.pchart-title {
+  margin-bottom: var(--s-4);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.pchart-bars {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.pchart-row {
+  display: grid;
+  grid-template-columns: 9.5rem minmax(0, 1fr) 3rem;
+  align-items: center;
+  gap: var(--s-3);
+}
+
+.pchart-label {
+  font-size: 14px;
+  color: var(--body);
+}
+
+.pchart-track {
+  display: flex;
+  gap: 2px;
+  min-width: 0;
+}
+
+/* One block of a bar, or one square of a grid. They switch on one at a time. */
+.pchart i {
+  flex: 0 1 8px;
+  height: 18px;
+  background: #33468a;
+}
+
+.pchart-row.is-highlight i {
+  background: var(--accent);
+}
+
+.pchart:not(.is-shown) i {
+  opacity: 0;
+}
+
+.pchart.is-shown i {
+  animation: block-on 1ms steps(1, end) calc(var(--i) * 22ms) both;
+}
+
+@keyframes block-on {
+  from {
+    opacity: 0;
+  }
+}
+
+.pchart-value {
+  font-family: var(--display);
+  font-size: var(--fs-xl);
+  line-height: 1;
+  color: var(--body);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pchart-row.is-highlight .pchart-value {
+  color: var(--accent);
+}
+
+.pchart-squares-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-5);
+}
+
+.pchart-squares {
+  display: grid;
+  grid-template-columns: repeat(20, 14px);
+  gap: 3px;
+}
+
+.pchart-squares i {
+  width: 14px;
+  height: 14px;
+  background: var(--line-strong);
+}
+
+.pchart-squares i.is-lit {
+  background: var(--accent);
+}
+
+.pchart-caption {
+  font-size: 15px;
+  color: var(--body);
+}
+
+@media (max-width: 520px) {
+  .pchart-row {
+    grid-template-columns: minmax(0, 1fr) 3rem;
+  }
+  .pchart-label {
+    grid-column: 1 / -1;
+  }
+  .pchart-squares {
+    grid-template-columns: repeat(10, 14px);
+  }
 }
 
 .case-next {
