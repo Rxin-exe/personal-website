@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { education, experience, type Experience as Role } from "@/content/site";
 import { bayerAt } from "@/lib/dither";
+import { paintCampanile } from "@/lib/campanile";
 import { FX_MARGIN, roleFx, type Built, type FxId, type Scene } from "@/lib/roleFx";
 import { sound } from "@/lib/sound";
 import SectionHead from "./SectionHead";
@@ -62,6 +63,7 @@ export default function Experience() {
   return (
     <section id="experience" className="container section" aria-labelledby="experience-title">
       <SectionHead id="experience" />
+      <Education />
       {/* The frame carries the 3D edge; the panel inside is clipped to pixel corners. */}
       <div className="roles-frame">
         <div className="roles-panel">
@@ -70,12 +72,6 @@ export default function Experience() {
               <RoleRow key={x.org} role={x} />
             ))}
           </ol>
-          <p className="roles-edu">
-            <span className="roles-edu-tag">Education</span>
-            <strong>{education.school}</strong>
-            <span>{education.degree}</span>
-            <span className="role-dates is-current">{education.dates}</span>
-          </p>
         </div>
       </div>
     </section>
@@ -184,6 +180,126 @@ function useRoleFx(id: FxId | undefined, rowRef: React.RefObject<HTMLLIElement |
   }, [id, rowRef, canvasRef]);
 
   return ctl;
+}
+
+/**
+ * Education, first and on its own: an ode to Berkeley. The Campanile at dusk in pixel art;
+ * hovering (or tapping) it plays on the motto, Fiat Lux: the bell chamber lights gold,
+ * lights come on across the hills, and the carillon rings.
+ */
+function Education() {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [lit, setLit] = useState(false);
+  const litRef = useRef(false);
+  const lastRing = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext("2d");
+    if (!canvas || !ctx) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let k = 0; // 0–1, how lit
+    let img: ImageData | null = null;
+    let raf = 0;
+    let last = 0;
+    let visible = false;
+
+    const size = () => {
+      const r = canvas.getBoundingClientRect();
+      const w = Math.max(1, Math.round(r.width / CELL));
+      const h = Math.max(1, Math.round(r.height / CELL));
+      if (canvas.width !== w || canvas.height !== h || !img) {
+        canvas.width = w;
+        canvas.height = h;
+        img = ctx.createImageData(w, h);
+      }
+    };
+    const frame = (now: number) => {
+      raf = 0;
+      if (!img) return;
+      const target = litRef.current ? 1 : 0;
+      k = reduced ? target : k + (target - k) * 0.12;
+      if (Math.abs(target - k) < 0.01) k = target;
+      // Stars twinkle slowly; a few frames a second is enough until it's lighting up.
+      if (now - last > (k === target ? 200 : 30)) {
+        last = now;
+        paintCampanile(img.data, canvas.width, canvas.height, k, reduced ? 0 : now);
+        ctx.putImageData(img, 0, 0);
+      }
+      if (visible && !reduced) raf = requestAnimationFrame(frame);
+    };
+    const kick = () => {
+      if (!raf) raf = requestAnimationFrame(frame);
+    };
+    size();
+    kick(); // the first frame paints whether or not it's on screen yet
+    const ro = new ResizeObserver(() => {
+      size();
+      last = 0;
+      kick();
+    });
+    ro.observe(canvas);
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) kick();
+    });
+    io.observe(canvas);
+    const onLit = () => kick();
+    canvas.addEventListener("lit", onLit);
+    return () => {
+      ro.disconnect();
+      io.disconnect();
+      canvas.removeEventListener("lit", onLit);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
+  const light = (on: boolean) => {
+    litRef.current = on;
+    setLit(on);
+    canvasRef.current?.dispatchEvent(new Event("lit"));
+    const now = performance.now();
+    if (on && now - lastRing.current > 2500) {
+      lastRing.current = now;
+      sound.carillon();
+    }
+  };
+
+  // Touch: tap to light, tap anywhere else to dim.
+  const pointer = useRef("mouse");
+  useEffect(() => {
+    if (!lit) return;
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" && !cardRef.current?.contains(e.target as Node)) light(false);
+    };
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  });
+
+  return (
+    <div className="edu-frame">
+      <div
+        ref={cardRef}
+        className={`edu ${lit ? "is-lit" : ""}`}
+        onPointerDown={(e) => (pointer.current = e.pointerType)}
+        onPointerEnter={(e) => e.pointerType === "mouse" && light(true)}
+        onPointerLeave={(e) => e.pointerType === "mouse" && light(false)}
+        onClick={() => pointer.current !== "mouse" && light(!lit)}
+      >
+        <canvas ref={canvasRef} className="edu-art" aria-hidden="true" />
+        <div className="edu-body">
+          <p className="edu-tag">Education</p>
+          <h3 className="edu-school">{education.school}</h3>
+          <p className="edu-degree">{education.degree}</p>
+          <p className="edu-motto">
+            <span lang="la">Fiat Lux</span>
+            <span className="edu-motto-en">let there be light</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function RoleRow({ role: x }: { role: Role }) {

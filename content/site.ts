@@ -81,7 +81,6 @@ export const experience: Experience[] = [
 export const education = {
   school: "UC Berkeley",
   degree: "B.A. Data Science & Cognitive Science",
-  dates: "2026 – now",
 };
 
 export type Project = {

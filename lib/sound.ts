@@ -695,6 +695,18 @@ export const sound = {
     }
   },
 
+  /**
+   * The Campanile's carillon: the first phrase of the Westminster Quarters (public
+   * domain, 1793), in long bell tones, from the tower's side of the card.
+   */
+  carillon() {
+    const a = live();
+    if (!a) return;
+    const t = a.ctx.currentTime + 0.02;
+    const out = bus(a, -0.25, 0.9);
+    [554.37, 493.88, 440, 329.63].forEach((f, i) => bell(a, f, t + i * 0.42, 0.03, out, 2.6));
+  },
+
   /** A result's bars filling in: a quiet run of three rising blips. */
   fill() {
     const a = live();
