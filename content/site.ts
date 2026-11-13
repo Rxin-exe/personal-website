@@ -533,7 +533,7 @@ export const sections: Record<"experience" | "projects" | "breakdowns" | "contac
   },
   contact: {
     label: "Contact",
-    title: "Hiring PM interns for Summer 2027?",
+    title: "Hiring interns for Summer 2027?",
     intro: "Email is the fastest way to reach me.",
   },
 };
