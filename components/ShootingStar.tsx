@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { bayerAt } from "@/lib/dither";
+import { sound } from "@/lib/sound";
 
 const CELL = 3;
 const FLIGHT_MS = 1100;
@@ -45,6 +46,7 @@ export default function ShootingStar() {
       const dy = len * 0.38;
       const t0 = performance.now();
       setFlying(true);
+      sound.star();
 
       const tick = (now: number) => {
         const t = Math.min(1, (now - t0) / FLIGHT_MS);
@@ -86,6 +88,7 @@ export default function ShootingStar() {
   }, []);
 
   const catchIt = (e: React.MouseEvent) => {
+    sound.caught();
     window.dispatchEvent(new CustomEvent("open-beta", { detail: { x: e.clientX, y: e.clientY } }));
   };
 

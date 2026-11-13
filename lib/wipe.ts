@@ -5,6 +5,7 @@
  */
 
 import { bayerAt } from "./dither";
+import { sound } from "./sound";
 
 const CELL = 3;
 const INK: [number, number, number] = [8, 11, 30];
@@ -52,6 +53,7 @@ function animate(ms: number, step: (t: number) => void) {
 export async function coverWipe(originX = window.innerWidth / 2, originY = window.innerHeight / 2) {
   if (reduced()) return;
   if (active) revealWipe(true);
+  sound.wipe();
   const canvas = document.createElement("canvas");
   canvas.className = "wipe";
   canvas.setAttribute("aria-hidden", "true");

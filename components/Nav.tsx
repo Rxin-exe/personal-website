@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { contact, nav, profile } from "@/content/site";
+import { SoundToggle } from "./SoundFx";
 
 export default function Nav() {
   const [active, setActive] = useState("");
@@ -31,17 +32,20 @@ export default function Nav() {
       <nav className="container" aria-label="Primary">
         <div className="nav-panel">
           <a href="/" className="logo" aria-label={`${profile.name}, back to top`}>
-            {profile.initials}
+            <span className="logo-face">{profile.initials}</span>
           </a>
           <ul className="nav-links">
             {nav.map(({ id, label }) => (
-              <li key={id} className="nav-section">
+              <li key={id} className={`nav-section ${active === id ? "is-current" : ""}`}>
                 <a href={`/#${id}`} aria-current={active === id ? "true" : undefined}>
                   {label}
                 </a>
               </li>
             ))}
             <li>
+              <SoundToggle />
+            </li>
+            <li className="nav-cta">
               <a href={`mailto:${contact.email}`} className="btn btn-primary btn-sm">
                 Email me
               </a>

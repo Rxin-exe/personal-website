@@ -3,6 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Close } from "./icons";
+import { sound } from "@/lib/sound";
 
 type Props = {
   labelledBy: string;
@@ -22,6 +23,7 @@ export default function Modal({ labelledBy, onClose, children }: Props) {
     const opener = document.activeElement as HTMLElement | null;
     const dialog = dialogRef.current;
     document.body.classList.add("modal-open");
+    sound.open();
     dialog?.focus({ preventScroll: true });
 
     const onKey = (e: KeyboardEvent) => {
@@ -49,6 +51,7 @@ export default function Modal({ labelledBy, onClose, children }: Props) {
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.classList.remove("modal-open");
+      sound.open(true);
       opener?.focus({ preventScroll: true });
     };
   }, []);

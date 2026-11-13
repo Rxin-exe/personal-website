@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { bayerAt, dither } from "@/lib/dither";
 import { scenes, type SceneId } from "@/lib/scenes";
+import { sound } from "@/lib/sound";
 
 /** CSS pixels per dither cell, everywhere on the site. */
 const CELL = 3;
@@ -271,6 +272,7 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
       const target = Math.max(0, Math.min(1, 1.15 - Math.hypot(dx, dy) / (base.width * 0.32)));
       if (Math.abs(target - hoverTarget) < 0.01) return;
       hoverTarget = target;
+      sound.glow(target);
       if (!hoverRaf) hoverRaf = requestAnimationFrame(settle);
     };
     if (s.hover && !reduced) window.addEventListener("pointermove", onPointer, { passive: true });
@@ -329,11 +331,11 @@ export default function DitherScene({ scene, className = "" }: { scene: SceneId;
         );
         // Info spots only explain (hover for the tip); the rest are buttons that do something.
         return p.info ? (
-          <span key={p.id} className={`scene-spot is-info tone-${p.tone ?? "moon"}`} style={style} title={p.label}>
+          <span key={p.id} data-spot={p.id} className={`scene-spot is-info tone-${p.tone ?? "moon"}`} style={style} title={p.label}>
             {tip}
           </span>
         ) : (
-          <button key={p.id} type="button" className={`scene-spot tone-${p.tone ?? "fire"}`} style={style} aria-label={p.label} onClick={() => actRef.current(p.id)}>
+          <button key={p.id} data-spot={p.id} type="button" className={`scene-spot tone-${p.tone ?? "fire"}`} style={style} aria-label={p.label} onClick={() => actRef.current(p.id)}>
             {tip}
           </button>
         );

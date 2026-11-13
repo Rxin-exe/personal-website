@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { contact, sections } from "@/content/site";
 import DitherScene from "./DitherScene";
 import { ArrowUpRight, Check, Copy } from "./icons";
+import { sound } from "@/lib/sound";
 
 export default function Contact() {
   const [copied, setCopied] = useState(false);
@@ -24,6 +25,7 @@ export default function Contact() {
       input.remove();
     }
     setCopied(true);
+    sound.success();
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 2000);
   };

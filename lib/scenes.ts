@@ -8,6 +8,7 @@
 
 import { daylight, redrawScene, summitSky } from "./daylight";
 import { PALETTE, paintClimber, paintHorizon, skyWindows, sunAt } from "./dither";
+import { sound } from "./sound";
 
 type RGB = [number, number, number];
 type Buf = Uint8ClampedArray;
@@ -380,7 +381,10 @@ function bearNow(L: ReturnType<typeof campLayout>, width: number, now: number) {
   // Only head out while the camp is on screen, so nobody misses it.
   if (!camp.bearAt && now >= camp.nextBear) {
     const r = typeof document !== "undefined" ? document.getElementById("contact")?.getBoundingClientRect() : undefined;
-    if (r && r.top < window.innerHeight * 0.6 && r.bottom > 0) camp.bearAt = now;
+    if (r && r.top < window.innerHeight * 0.6 && r.bottom > 0) {
+      camp.bearAt = now;
+      sound.bearWalk(BEAR_MS);
+    }
     else camp.nextBear = now + 3000;
   }
   if (!camp.bearAt) return null;
@@ -571,14 +575,17 @@ function campAct(id: string, instant: boolean) {
   const now = performance.now();
   if (id === "bear") {
     camp.hopAt = instant ? 0 : performance.now();
+    sound.bear();
     return instant ? 0 : 450;
   }
   if (id === "tent") {
     camp.tentOff = !camp.tentOff;
+    sound.tent(camp.tentOff);
     return 0;
   }
   if (id === "fire") {
     camp.sparkAt = instant ? 0 : now;
+    sound.stoke();
     return instant ? 0 : SPARK_MS;
   }
   if (id === "send" && !camp.sent && !camp.sendAt) {
@@ -587,6 +594,7 @@ function campAct(id: string, instant: boolean) {
       return 0;
     }
     camp.sendAt = now;
+    sound.send();
     return SEND_MS;
   }
   return 0;
@@ -603,7 +611,9 @@ function summitClick(x: number, y: number, width: number, height: number) {
   const now = performance.now();
   sunClicks.count = now - sunClicks.last < 2000 ? sunClicks.count + 1 : 1;
   sunClicks.last = now;
+  if (!sunClicks.busy) sound.sun(sunClicks.count);
   if (sunClicks.count < 5 || sunClicks.busy || daylight.on) return;
+  sound.sunset();
   sunClicks.count = 0;
   sunClicks.busy = true;
   const step = (mode: typeof summitSky.mode, after: number) =>
@@ -614,6 +624,7 @@ function summitClick(x: number, y: number, width: number, height: number) {
   step("dusk", 0);
   step("night", 1100);
   step("sunset", 7000);
+  setTimeout(() => sound.sunrise(), 7000);
   setTimeout(() => (sunClicks.busy = false), 7800);
 }
 

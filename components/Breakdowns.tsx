@@ -33,9 +33,15 @@ export default function Breakdowns() {
             >
               <span className="teardown-top">
                 <PixelLogo path={b.icon ? brandIcons[b.icon] : undefined} fallback={b.logo} />
-                <span className="teardown-product">{b.product}</span>
+                <span className="teardown-product">
+                  {b.product}
+                  <span className="teardown-category">{b.category}</span>
+                </span>
               </span>
               <span className="teardown-title">{b.title}</span>
+              <span className="teardown-ship">
+                <span className="teardown-ship-tag">I&apos;d ship</span> {b.recommendation.pitch}
+              </span>
               <span className="teardown-foot">
                 <span className="teardown-cta">Read the teardown</span>
                 <span className="teardown-meta">{b.readTime}</span>

@@ -5,6 +5,7 @@ import BetaEgg from "@/components/BetaEgg";
 import CommandMenu from "@/components/CommandMenu";
 import ConsoleHello from "@/components/ConsoleHello";
 import ShootingStar from "@/components/ShootingStar";
+import SoundFx from "@/components/SoundFx";
 import Starfield from "@/components/Starfield";
 import { WipeReveal } from "@/components/WipeLink";
 import "./globals.css";
@@ -55,6 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ShootingStar />
         <WipeReveal />
         <ConsoleHello />
+        <SoundFx />
       </body>
     </html>
   );

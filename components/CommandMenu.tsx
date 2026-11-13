@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { breakdowns, contact, nav, projects } from "@/content/site";
+import { sound } from "@/lib/sound";
 
 type Item = { group: string; label: string; hint?: string; run: () => void };
 
@@ -26,8 +27,10 @@ export default function CommandMenu() {
       { group: "Links", label: "Resume (PDF)", run: () => window.open(contact.resume, "_blank", "noopener") },
       { group: "Links", label: "Email", hint: contact.email, run: () => (window.location.href = `mailto:${contact.email}`) },
       { group: "Links", label: "LinkedIn", run: () => window.open(contact.linkedin, "_blank", "noopener") },
+      { group: "Settings", label: sound.isOn() ? "Turn sound off" : "Turn sound on", hint: "ambience and effects", run: () => sound.setOn(!sound.isOn()) },
     ],
-    []
+    // Rebuilt each time it opens, so the sound item says what it'll do now.
+    [open]
   );
 
   const results = useMemo(() => {
@@ -60,7 +63,11 @@ export default function CommandMenu() {
     setQuery("");
     setActive(0);
     inputRef.current?.focus();
-    return () => openerRef.current?.focus({ preventScroll: true });
+    sound.open();
+    return () => {
+      sound.open(true);
+      openerRef.current?.focus({ preventScroll: true });
+    };
   }, [open]);
 
   useEffect(() => setActive(0), [query]);

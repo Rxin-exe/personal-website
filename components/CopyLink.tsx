@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, LinkIcon } from "./icons";
+import { sound } from "@/lib/sound";
 
 /** Copies the current page URL (which includes the write-up's hash). */
 export default function CopyLink() {
@@ -16,6 +17,7 @@ export default function CopyLink() {
       return;
     }
     setCopied(true);
+    sound.success();
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setCopied(false), 1800);
   };

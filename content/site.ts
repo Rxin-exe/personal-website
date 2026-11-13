@@ -24,22 +24,27 @@ export type Experience = {
   role: string;
   dates: string;
   result: string; // one sentence, lead with the outcome
-  metric?: { value: string; label: string }; // the headline number, shown in the pixel face
+  /** The headline number. `compare` (before → now, same unit) draws two pixel bars under it. */
+  metric?: { value: string; label: string; compare?: { from: number; to: number } };
   href?: string; // e.g. "/work/sendo" to open the case study
+  /** What the row turns into on hover (lib/roleFx.ts). */
+  fx?: "ice" | "rock" | "laser" | "robot" | "tennis";
 };
 
 /** Newest first. One line each: the result, not the duties. */
 export const experience: Experience[] = [
   {
     org: "Cal Hockey",
+    fx: "ice",
     role: "Product & Software Engineering Intern",
     dates: "Aug 2026 – now",
     result:
       "Turned 12+ player and coach interviews into a sideline tagging workflow that cut daily film review from 2–3 hours to 20 minutes. The coaching staff now uses it at every game.",
-    metric: { value: "20 min", label: "daily film review, from 2–3 hours" },
+    metric: { value: "20 min", label: "daily film review, from 2–3 hours", compare: { from: 150, to: 20 } },
   },
   {
     org: "Sendo",
+    fx: "rock",
     role: "Founder & Product Lead",
     dates: "Feb 2026 – now",
     result: "Scoped and shipped an AI form coach for climbers. 40+ beta users, 400+ climbs logged, 70% 30-day retention.",
@@ -48,13 +53,15 @@ export const experience: Experience[] = [
   },
   {
     org: "Handshake AI",
+    fx: "laser",
     role: "AI Fellow, frontier model evaluation",
     dates: "Jul – Oct 2026",
     result: "Ranked 152 recurring LLM failure patterns and rewrote the evaluation rubrics, raising reviewer agreement from 30% to 75%.",
-    metric: { value: "75%", label: "reviewer agreement, from 30%" },
+    metric: { value: "75%", label: "reviewer agreement, from 30%", compare: { from: 30, to: 75 } },
   },
   {
     org: "Outamation",
+    fx: "robot",
     role: "Data Science Intern, mortgage automation",
     dates: "Nov 2025 – Mar 2026",
     result: "Built PDF extraction pipelines that cut per-document handling from 20 to 5 minutes, saving a 15-person team 10 hours a week.",
@@ -62,6 +69,7 @@ export const experience: Experience[] = [
   },
   {
     org: "S.L.I.C.E. Athletics",
+    fx: "tennis",
     role: "Co-Founder & Vice President, nonprofit",
     dates: "Nov 2022 – Aug 2025",
     result:
@@ -218,7 +226,8 @@ export type Breakdown = {
   users: string[];
   works: { point: string; why: string }[];
   friction: { point: string; opportunity: string }[];
-  recommendation: { feature: string; rationale: string[] };
+  /** `pitch`: what I'd ship, in a few words, shown on the card as the hook. */
+  recommendation: { feature: string; pitch: string; rationale: string[] };
   metrics: { northStar: string; supporting: string[] };
   risks: string[];
 };
@@ -271,6 +280,7 @@ export const breakdowns: Breakdown[] = [
     ],
     recommendation: {
       feature: "“Streak Recovery”: a 48-hour window to rebuild a broken streak by completing two harder lessons.",
+      pitch: "Streak Recovery, a second chance for broken streaks",
       rationale: [
         "Targets the highest-value moment in the lifecycle: a committed user about to churn.",
         "Asks for more effort, not money, which rewards learning instead of just showing up.",
@@ -338,6 +348,7 @@ export const breakdowns: Breakdown[] = [
     ],
     recommendation: {
       feature: "A 60-second “what are you here for?” setup that builds a small starter workspace and explains each piece as you use it.",
+      pitch: "A 60-second setup that ends the blank page",
       rationale: [
         "Shrinks the choice from hundreds of templates to one, based on the user's stated goal.",
         "Teaches database concepts in context, the moment the user needs them.",
@@ -405,6 +416,7 @@ export const breakdowns: Breakdown[] = [
     ],
     recommendation: {
       feature: "“Premium moments”: give free users a short, free Premium session at a high-intent moment, like their first long trip with no signal.",
+      pitch: "Premium moments, a free taste right when it matters",
       rationale: [
         "Lets users feel the value instead of reading about it.",
         "Ties the upgrade prompt to a real need (offline listening) rather than a generic banner.",
@@ -472,6 +484,7 @@ export const breakdowns: Breakdown[] = [
     ],
     recommendation: {
       feature: "A climbing session logger: tap to log each problem's grade, attempts, and send, then share a session card showing hardest send and a grade pyramid.",
+      pitch: "A session logger built for how climbers train",
       rationale: [
         "Gives climbers the progress signal they actually care about, in the same tap-to-log spirit as Strava's recording.",
         "Creates something worth giving kudos to, which restarts the social loop.",
