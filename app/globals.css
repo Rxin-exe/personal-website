@@ -1660,6 +1660,32 @@ html.daytime .scene-spot {
   height: 4px;
 }
 
+/* The moon sits high, behind the contact heading: its bubble opens below it instead,
+   with the thought trail stepping up toward the moon. */
+.scene-spot[data-spot="moon"] .scene-tip {
+  top: calc(100% + 22px);
+  bottom: auto;
+}
+
+.scene-spot[data-spot="moon"] .scene-tip::before {
+  top: -10px;
+  bottom: auto;
+}
+
+.scene-spot[data-spot="moon"] .scene-tip::after {
+  top: -19px;
+  bottom: auto;
+}
+
+/* On phones the contact copy fills the whole width around the moon and the moon sits at
+   the screen's edge, so there's nowhere clear for its bubble: it's only an info label,
+   so phones go without it. */
+@media (max-width: 640px) {
+  .scene-spot[data-spot="moon"] .scene-tip {
+    display: none;
+  }
+}
+
 .scene-spot:hover .scene-tip,
 .scene-spot:focus-visible .scene-tip {
   opacity: 1;
@@ -1746,6 +1772,15 @@ html.daytime .scene-spot {
 
 .contact-links a:hover {
   color: var(--text);
+}
+
+/* Phones: the copy wraps taller, so give the camp more room underneath it. The climber's
+   thought bubbles (sending, the fire, the tent) sit above the boulder, and need to land
+   clear of the links rather than on top of them. */
+@media (max-width: 640px) {
+  .contact {
+    padding-bottom: 460px;
+  }
 }
 
 @media (max-width: 480px) {

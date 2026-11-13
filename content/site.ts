@@ -46,7 +46,7 @@ export const experience: Experience[] = [
     org: "Sendo",
     fx: "rock",
     role: "Founder & Product Lead",
-    dates: "Feb 2026 – now",
+    dates: "Apr 2026 – now",
     result: "Scoped and shipped an AI form coach for climbers. 40+ beta users, 400+ climbs logged, 70% 30-day retention.",
     metric: { value: "70%", label: "30-day retention" },
     href: "/work/sendo",
@@ -510,7 +510,7 @@ export const contact = {
   email: "ronanwong@berkeley.edu",
   linkedin: "https://www.linkedin.com/in/ronanwong",
   github: "https://github.com/Rxin-exe",
-  resume: "/Ronan_Wong_Resume.pdf", // phone number and grad date removed
+  resume: "/Ronan_Wong_Resume.pdf",
 };
 
 type SectionCopy = { label: string; title: string; intro?: string };
